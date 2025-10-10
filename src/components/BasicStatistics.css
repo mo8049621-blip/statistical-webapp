@@ -1,0 +1,368 @@
+/* BasicStatistics 组件样式 */
+.basic-statistics {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.statistics-overview {
+  margin-bottom: 2rem;
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e1e5e9;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card h4 {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-family: 'Courier New', monospace;
+}
+
+.stat-description {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* 不同统计指标的颜色主题 */
+.stat-card.mean {
+  border-left: 4px solid #3b82f6;
+}
+
+.stat-card.median {
+  border-left: 4px solid #10b981;
+}
+
+.stat-card.mode {
+  border-left: 4px solid #f59e0b;
+}
+
+.stat-card.std-dev {
+  border-left: 4px solid #8b5cf6;
+}
+
+.stat-card.variance {
+  border-left: 4px solid #ec4899;
+}
+
+.stat-card.range {
+  border-left: 4px solid #ef4444;
+}
+
+.visualization-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e1e5e9;
+  margin-bottom: 2rem;
+}
+
+.visualization-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.visualization-header h3 {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.chart-type-selector {
+  display: flex;
+  gap: 0.5rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.chart-type-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.chart-type-button:hover {
+  background-color: #e2e8f0;
+  color: #2c3e50;
+}
+
+.chart-type-button.active {
+  background-color: #667eea;
+  color: white;
+}
+
+.bins-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.bins-control label {
+  font-size: 0.9rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.bins-slider {
+  width: 150px;
+  height: 6px;
+  border-radius: 3px;
+  background: #e1e5e9;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.bins-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.bins-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.bins-value {
+  font-weight: 600;
+  color: #667eea;
+  min-width: 30px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+}
+
+.chart-container {
+  flex: 1;
+  min-height: 300px;
+  position: relative;
+}
+
+.chart-container canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.data-summary {
+  background-color: #f8fafc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border-left: 4px solid #667eea;
+  margin-bottom: 2rem;
+}
+
+.data-summary h4 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.summary-text {
+  color: #64748b;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .statistics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1.25rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .visualization-section {
+    padding: 1.25rem;
+  }
+  
+  .visualization-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .chart-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chart-type-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .chart-type-button {
+    flex: 1;
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .bins-control {
+    width: 100%;
+  }
+  
+  .bins-slider {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .data-summary {
+    padding: 1.25rem;
+  }
+  
+  .chart-container {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .visualization-section {
+    padding: 1rem;
+  }
+  
+  .visualization-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .chart-type-selector {
+    flex-wrap: wrap;
+  }
+  
+  .chart-type-button {
+    min-width: calc(50% - 0.25rem);
+    margin-bottom: 0.25rem;
+  }
+  
+  .chart-container {
+    min-height: 200px;
+  }
+  
+  .data-summary {
+    padding: 1rem;
+  }
+  
+  .summary-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* 加载和错误状态 */
+.loading-stats {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+}
+
+.error-stats {
+  text-align: center;
+  padding: 3rem;
+  color: #e74c3c;
+}
+
+.no-data-stats {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+}
+
+/* 自定义滚动条 */
+.chart-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.chart-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.chart-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.chart-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

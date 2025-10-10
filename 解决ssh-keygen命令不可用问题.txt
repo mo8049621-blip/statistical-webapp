@@ -1,0 +1,69 @@
+# 解决ssh-keygen命令不可用问题
+
+当您在命令提示符中运行`ssh-keygen`命令时出现"不是内部或外部命令，也不是可运行的程序或批处理文件"错误，这通常是因为您的系统中找不到这个命令。以下是详细的解决方案：
+
+## 问题原因
+
+1. **Git未安装**：ssh-keygen工具通常随Git一起安装
+2. **Git已安装但未配置环境变量**：系统无法在默认路径中找到该命令
+3. **Git安装不完整**：某些组件可能未正确安装
+
+## 解决方案
+
+### 第一步：确认Git是否已安装
+
+1. 在命令提示符中输入以下命令并按Enter：
+   ```cmd
+   git --version
+   ```
+
+2. 如果显示Git版本信息，说明Git已安装；如果显示类似"'git' 不是内部或外部命令"，则需要安装Git
+
+### 第二步：如果Git已安装但ssh-keygen不可用
+
+1. **查找Git的安装路径**：
+   ```cmd
+   where git
+   ```
+   这会显示Git的安装路径，例如：`C:\Program Files\Git\cmd\git.exe`
+
+2. **使用完整路径运行ssh-keygen**：
+   根据上面的安装路径，ssh-keygen通常位于`Git\usr\bin`目录下
+   ```cmd
+   "C:\Program Files\Git\usr\bin\ssh-keygen.exe" -t rsa -b 4096 -C "您的GitHub邮箱"
+   ```
+
+3. **配置环境变量**（一次性解决）：
+   - 右键点击"此电脑"或"计算机"，选择"属性"
+   - 点击"高级系统设置" > "环境变量"
+   - 在"系统变量"中找到"Path"，双击编辑
+   - 点击"新建"，添加Git的bin目录路径，例如：`C:\Program Files\Git\usr\bin`
+   - 点击"确定"保存所有更改
+   - 关闭所有命令提示符窗口，重新打开后ssh-keygen命令应该可用了
+
+### 第三步：如果Git未安装
+
+1. 访问Git官网下载安装程序：https://git-scm.com/download/win
+2. 运行安装程序，按照提示完成安装（建议使用默认选项）
+3. 安装完成后，重新打开命令提示符，ssh-keygen命令应该可用了
+
+## 替代方法：使用GitHub Desktop
+
+如果您觉得上述步骤较复杂，可以使用GitHub Desktop来管理SSH密钥：
+
+1. 下载并安装GitHub Desktop：https://desktop.github.com/
+2. 打开GitHub Desktop，登录您的GitHub账号
+3. 点击"文件" > "选项" > "SSH和GPG密钥"
+4. 点击"生成新的SSH密钥"按钮，按照提示操作
+
+## 验证配置是否成功
+
+完成上述步骤后，您可以使用以下命令测试SSH连接：
+
+```cmd
+ssh -T git@github.com
+```
+
+如果看到"Hi [您的用户名]! You've successfully authenticated"的消息，说明配置成功。
+
+如果您在操作过程中遇到任何问题，请随时查阅此指南或重新运行我们提供的Git配置助手工具。

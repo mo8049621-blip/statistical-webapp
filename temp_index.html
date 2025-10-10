@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析平台 - 临时访问页面</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 90%;
+            margin: 2rem auto;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #1e40af;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        h3 {
+            color: #166534;
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        
+        p {
+            color: #4b5563;
+            margin-bottom: 1rem;
+        }
+        
+        .info-box {
+            background-color: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .option-box {
+            background-color: #f0fdf4;
+            border: 1px solid #dcfce7;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .option-box.purple {
+            background-color: #faf5ff;
+            border-color: #f3e8ff;
+        }
+        
+        .option-box.purple h3 {
+            color: #6d28d9;
+        }
+        
+        .troubleshooting-box {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: 0.375rem;
+            padding: 1rem;
+        }
+        
+        .troubleshooting-box h3 {
+            color: #92400e;
+        }
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            background-color: #16a34a;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .button:hover {
+            background-color: #15803d;
+        }
+        
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+        }
+        
+        code {
+            background-color: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+        
+        /* 简单的图标替代 */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        .icon.info::before {
+            content: "ℹ";
+            font-size: 18px;
+        }
+        
+        .icon.external::before {
+            content: "→";
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="text-center mb-4">
+                <h1>数据分析平台</h1>
+                <p>临时访问页面</p>
+            </div>
+            
+            <div class="info-box">
+                <h2>
+                    <span class="icon info"></span>
+                    开发服务器重启状态
+                </h2>
+                <p>开发服务器已成功重启！由于Vite客户端文件加载问题，您可以：</p>
+            </div>
+            
+            <div class="space-y-4 mb-4">
+                <div class="option-box">
+                    <h3>选项 1：尝试直接访问</h3>
+                    <p>点击下方链接尝试直接访问开发服务器：</p>
+                    <a href="http://localhost:5176" target="_blank" rel="noopener noreferrer" class="button">
+                        <span class="icon external"></span>
+                        访问开发服务器 (端口 5176)
+                    </a>
+                </div>
+                
+                <div class="option-box purple">
+                    <h3>选项 2：使用批处理文件</h3>
+                    <p>您可以手动运行项目根目录下的 <code>start_dev_server.bat</code> 文件</p>
+                </div>
+            </div>
+            
+            <div class="troubleshooting-box">
+                <h3>如果仍然遇到问题：</h3>
+                <ul>
+                    <li>关闭所有浏览器窗口和终端</li>
+                    <li>等待几分钟后重新启动计算机</li>
+                    <li>再次尝试运行 <code>start_dev_server.bat</code></li>
+                    <li>如果问题持续，请查看浏览器控制台(F12)获取详细错误信息</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 数据分析平台</p>
+        </div>
+    </div>
+</body>
+</html>
