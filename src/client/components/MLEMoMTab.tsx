@@ -1,20 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Box, Text, Card, CardBody, Grid, Select, Button, Alert, AlertIcon, AlertDescription } from '@chakra-ui/react';
 import { calculateMLE, calculateMoM } from '../utils/statistics';
-import { MLEMoMTabProps, EstimationResult } from '../types';
+import { EstimationResult, BasicStats } from '../types';
 
-function MLEMoMTab({ dataset, distribution }: MLEMoMTabProps) {
+interface MLEMoMTabProps {
+  dataset: number[];
+  distribution: string;
+}
+
+function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { basicStats?: BasicStats | null }) {
   const [selectedDistribution, setSelectedDistribution] = useState<string>('normal');
   const [estimationResults, setEstimationResults] = useState<EstimationResult[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const isGeneratedDataset = !!distribution;
 
   useEffect(() => {
     // 当数据集或分布变化时，自动更新选择的分布
     if (distribution && dataset.length > 0) {
-      setSelectedDistribution(distribution.type);
+      setSelectedDistribution(distribution);
       handleEstimate();
     }
-  }, [dataset, distribution]);
+  }, [dataset, distribution, basicStats]);
 
   const handleDistributionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDistribution(e.target.value);
@@ -31,14 +37,14 @@ function MLEMoMTab({ dataset, distribution }: MLEMoMTabProps) {
 
     try {
       // 计算MLE估计
-      const mleParams = calculateMLE(dataset, selectedDistribution);
+      const mleParams = calculateMLE(dataset, selectedDistribution, basicStats);
       results.push({
         method: '极大似然估计 (MLE)',
         params: mleParams
       });
 
       // 计算MoM估计
-      const momParams = calculateMoM(dataset, selectedDistribution);
+      const momParams = calculateMoM(dataset, selectedDistribution, basicStats);
       results.push({
         method: '矩估计法 (MoM)',
         params: momParams
@@ -68,20 +74,31 @@ function MLEMoMTab({ dataset, distribution }: MLEMoMTabProps) {
             <CardBody>
               <Text fontSize="lg" fontWeight="bold" mb={4}>参数估计</Text>
               
-              <Box mb={4}>
-                <Text mb={2}>选择分布类型：</Text>
-                <Select
-                  value={selectedDistribution}
-                  onChange={handleDistributionChange}
-                  width="full"
-                >
-                  {distributionOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </Select>
-              </Box>
+              {/* 仅当分布未知时显示手动选择选项 */}
+              {!isGeneratedDataset ? (
+                <Box mb={4}>
+                  <Text mb={2}>选择分布类型：</Text>
+                  <Select
+                    value={selectedDistribution}
+                    onChange={handleDistributionChange}
+                    width="full"
+                  >
+                    {distributionOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Select>
+                </Box>
+              ) : distribution ? (
+                <Box mb={4} bg="blue.50" p={4} borderRadius="md">
+                  <Text fontWeight="medium" mb={2}>自动检测结果：</Text>
+                  <Text fontSize="sm" mb={1}>分布类型：{distribution}</Text>
+                  <Text fontSize="sm" mt={2} color="blue.700">
+                    使用{distribution}进行极大似然估计和矩估计
+                  </Text>
+                </Box>
+              ) : null}
               
               <Button
                 colorScheme="blue"

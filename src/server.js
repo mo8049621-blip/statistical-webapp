@@ -1,4 +1,5 @@
-require('dotenv').config();
+// 为避免环境变量影响，暂时不加载dotenv
+// require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const { create, all } = require('mathjs');
@@ -7,7 +8,8 @@ const { create, all } = require('mathjs');
 const math = create(all);
 
 const app = express();
-const port = process.env.PORT || 3001;
+// 直接硬编码端口，不使用环境变量
+const port = 3003;
 
 // Middleware
 app.use(express.json());
@@ -589,9 +591,11 @@ function gamma(z) {
   return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
 }
 
-// Start the server
-app.listen(port, () => {
-  console.log(`\n=== Probability Distribution Webapp ===`);
+// 启动服务器，使用指定端口
+// 显式使用3003端口，避免任何可能的环境变量覆盖或缓存问题
+const server = app.listen(3003, () => {
+  console.log(`
+=== Probability Distribution Webapp ===`);
   console.log(`Server running at http://localhost:${port}`);
   console.log(`API documentation: http://localhost:${port}/api`);
   console.log(`\nAvailable probability distributions:`);

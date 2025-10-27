@@ -1,4 +1,4 @@
-import { Box, Text, Button, Grid, GridItem } from '@chakra-ui/react';
+import { Box, Button, Grid } from '@chakra-ui/react';
 import FileUploader from './FileUploader';
 import DistributionGenerator from './DistributionGenerator';
 import AIDataGenerator from './AIDataGenerator';
