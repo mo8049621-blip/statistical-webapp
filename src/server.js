@@ -9,7 +9,7 @@ const math = create(all);
 
 const app = express();
 // 直接硬编码端口，不使用环境变量
-const port = 3003;
+const port = 3005;
 
 // Middleware
 app.use(express.json());
