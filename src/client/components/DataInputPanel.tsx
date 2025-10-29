@@ -1,4 +1,4 @@
-import { Box, Button, Grid } from '@chakra-ui/react';
+import { Box, Button, Grid, Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/react';
 import FileUploader from './FileUploader';
 import DistributionGenerator from './DistributionGenerator';
 import AIDataGenerator from './AIDataGenerator';
@@ -10,29 +10,27 @@ function DataInputPanel({ onDataChange }: DataInputPanelProps) {
 
   return (
     <Box p={6} border="1px" borderColor="gray.200" borderRadius="md" bg="white">
-      <Grid templateColumns="repeat(3, 1fr)" gap={2} mb={4}>
-        <Button
-          onClick={() => setActivePanel('upload')}
-          variant={activePanel === 'upload' ? 'solid' : 'outline'}
-          colorScheme="blue"
-        >
-          文件上传
-        </Button>
-        <Button
-          onClick={() => setActivePanel('distribution')}
-          variant={activePanel === 'distribution' ? 'solid' : 'outline'}
-          colorScheme="blue"
-        >
-          分布生成
-        </Button>
-        <Button
-          onClick={() => setActivePanel('ai')}
-          variant={activePanel === 'ai' ? 'solid' : 'outline'}
-          colorScheme="blue"
-        >
-          AI生成数据
-        </Button>
-      </Grid>
+      <Tabs defaultIndex={0} w="100%" onChange={(index: number) => {
+        const panels = ['upload', 'distribution', 'ai'];
+        setActivePanel(panels[index]);
+      }}>
+        <TabList mb="4" gridTemplateColumns="repeat(3, 1fr)">
+          <Tab>File Upload</Tab>
+          <Tab>Distribution Generation</Tab>
+          <Tab>AI Data Generation</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <FileUploader onDataChange={onDataChange} />
+          </TabPanel>
+          <TabPanel>
+            <DistributionGenerator onDataChange={onDataChange} />
+          </TabPanel>
+          <TabPanel>
+            <AIDataGenerator onDataChange={onDataChange} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
       
       {activePanel === 'upload' && (
         <FileUploader onDataChange={onDataChange} />

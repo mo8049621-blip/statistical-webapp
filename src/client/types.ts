@@ -1,6 +1,6 @@
-// 共享类型定义
+// Shared type definitions
 
-// 基本统计量接口
+// Basic statistics interface
 export interface BasicStats {
   mean: number;
   std: number;
@@ -12,43 +12,50 @@ export interface BasicStats {
   min: number;
   max: number;
   mode?: number | number[];
-}
+};
 
+// Distribution information interface
 export interface DistributionInfo {
   type: string;
   name: string;
   formula?: string;
   parameters?: Record<string, number | string>;
-}
+};
 
+// Data input panel props interface
 export interface DataInputPanelProps {
   onDataChange: (data: number[], distribution?: DistributionInfo | null) => void;
-}
+};
 
+// File uploader props interface
 export interface FileUploaderProps {
   onDataChange: (data: number[], distribution?: DistributionInfo | null) => void;
-}
+};
 
+// Distribution generator props interface
 export interface DistributionGeneratorProps {
   onDataChange: (data: number[], distribution?: DistributionInfo | null) => void;
-}
+};
 
+// AI data generator props interface
 export interface AIDataGeneratorProps {
   onDataChange: (data: number[], distribution?: DistributionInfo | null) => void;
-}
+};
 
+// Basic statistics tab props interface
 export interface BasicStatisticsTabProps {
   dataset: number[];
-}
+};
 
+// MLE/MoM tab props interface
 export interface MLEMoMTabProps {
   dataset: number[];
   distribution: DistributionInfo | null;
   isGeneratedDataset?: boolean;
   basicStats?: BasicStats | null;
-}
+};
 
-// 置信区间容器属性接口
+// Confidence intervals container props interface
 export interface ConfidenceIntervalsContainerProps {
   dataset: number[];
   dataset2?: number[];
@@ -56,9 +63,9 @@ export interface ConfidenceIntervalsContainerProps {
   isGeneratedDataset?: boolean;
   distributionInfo?: DistributionInfo | null;
   basicStats?: BasicStats | null;
-}
+};
 
-// 假设检验属性接口
+// Hypothesis testing props interface
 export interface HypothesisTestingTabProps {
   dataset: number[];
   dataset2?: number[];
@@ -66,8 +73,9 @@ export interface HypothesisTestingTabProps {
   isGeneratedDataset?: boolean;
   distributionInfo?: DistributionInfo | null;
   basicStats?: BasicStats | null;
-}
+};
 
+// Distribution parameter interface
 export interface DistributionParam {
   name: string;
   label: string;
@@ -75,15 +83,17 @@ export interface DistributionParam {
   max: number;
   step: number;
   defaultValue: number;
-}
+};
 
+// Distribution configuration interface
 export interface DistributionConfig {
   name: string;
   params: DistributionParam[];
   formula?: string;
-}
+};
 
+// Parameter estimation result interface
 export interface EstimationResult {
   method: string;
   params: Record<string, number>;
-}
+};

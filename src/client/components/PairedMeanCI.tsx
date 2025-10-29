@@ -26,7 +26,7 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
       .filter(s => s.trim() !== '')
       .map(s => {
         const num = parseFloat(s);
-        if (isNaN(num)) throw new Error('数据格式错误，请输入数字');
+        if (isNaN(num)) throw new Error('Invalid data format, please enter numbers');
         return num;
       });
   };
@@ -39,11 +39,11 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
       const confidence = parseFloat(confidenceLevel);
 
       if (before.length === 0 || after.length === 0) {
-        throw new Error('数据不能为空');
+        throw new Error('Data cannot be empty');
       }
 
       if (before.length !== after.length) {
-        throw new Error('前后两组数据长度必须相同');
+        throw new Error('Before and after datasets must have the same length');
       }
 
       const ciResult = calculateTwoSampleConfidenceInterval(
@@ -55,7 +55,7 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
 
       setResult(ciResult);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '计算错误');
+      setError(err instanceof Error ? err.message : 'Calculation error');
       setResult(null);
     }
   };
@@ -70,7 +70,7 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
     <Card>
       <CardBody>
         <Text fontSize="xl" fontWeight="bold" mb={6} textAlign="center">
-          配对样本均值之差的置信区间
+          Paired Samples Mean Difference Confidence Interval
         </Text>
 
         {error && (
@@ -81,22 +81,22 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
 
         <VStack spacing={4} align="stretch">
           <Box>
-            <Text fontWeight="medium" mb={2}>前测数据（用逗号或空格分隔）</Text>
+            <Text fontWeight="medium" mb={2}>Pre-test Data (comma or space separated)</Text>
             <Textarea
               value={beforeData}
               onChange={(e) => setBeforeData(e.target.value)}
-              placeholder="例如：10.2, 11.5, 9.8, 12.1"
+              placeholder="Example: 10.2, 11.5, 9.8, 12.1"
               size="lg"
               rows={3}
             />
           </Box>
 
           <Box>
-            <Text fontWeight="medium" mb={2}>后测数据（用逗号或空格分隔）</Text>
+            <Text fontWeight="medium" mb={2}>Post-test Data (comma or space separated)</Text>
             <Textarea
               value={afterData}
               onChange={(e) => setAfterData(e.target.value)}
-              placeholder="例如：12.5, 13.2, 11.8, 14.2"
+              placeholder="Example: 12.5, 13.2, 11.8, 14.2"
               size="lg"
               rows={3}
             />
@@ -104,7 +104,7 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
 
           <HStack>
             <Box flex={1}>
-              <Text fontWeight="medium" mb={2}>置信水平</Text>
+              <Text fontWeight="medium" mb={2}>Confidence Level</Text>
               <Select
                 value={confidenceLevel}
                 onChange={(e) => setConfidenceLevel(e.target.value)}
@@ -117,35 +117,35 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
               </Select>
             </Box>
             <Button onClick={handleCalculate} colorScheme="blue" size="lg">
-              计算置信区间
+              Calculate Confidence Interval
             </Button>
           </HStack>
         </VStack>
 
         {result && (
           <Box mt={6} p={4} borderWidth={1} borderRadius="lg" bg="gray.50">
-            <Text fontSize="lg" fontWeight="bold" mb={4}>计算结果</Text>
+            <Text fontSize="lg" fontWeight="bold" mb={4}>Calculation Results</Text>
             
             <Table variant="simple" mb={4}>
               <tbody>
                 <Tr>
-                  <Th>统计量</Th>
+                  <Th>Statistic</Th>
                   <Td>{result.method}</Td>
                 </Tr>
                 <Tr>
-                  <Th>均值差</Th>
+                  <Th>Mean Difference</Th>
                   <Td>{result.meanDiff.toFixed(4)}</Td>
                 </Tr>
                 <Tr>
-                  <Th>临界值</Th>
+                  <Th>Critical Value</Th>
                   <Td>{result.criticalValue.toFixed(4)}</Td>
                 </Tr>
                 <Tr>
-                  <Th>边际误差</Th>
+                  <Th>Margin of Error</Th>
                   <Td>{result.marginOfError.toFixed(4)}</Td>
                 </Tr>
                 <Tr>
-                  <Th>置信区间</Th>
+                  <Th>Confidence Interval</Th>
                   <Td>[{result.lower.toFixed(4)}, {result.upper.toFixed(4)}]</Td>
                 </Tr>
               </tbody>
@@ -153,14 +153,14 @@ function PairedMeanCI({ pairedData = { before: [], after: [] } }: PairedMeanCIPr
 
             {differences.length > 0 && (
               <Box mt={4}>
-                <Text fontWeight="medium" mb={2}>差值数据统计</Text>
+                <Text fontWeight="medium" mb={2}>Difference Data Statistics</Text>
                 <Table variant="simple">
                   <thead>
                     <Tr>
-                      <Th>索引</Th>
-                      <Th>前测值</Th>
-                      <Th>后测值</Th>
-                      <Th>差值</Th>
+                      <Th>Index</Th>
+                      <Th>Pre-test Value</Th>
+                      <Th>Post-test Value</Th>
+                      <Th>Difference</Th>
                     </Tr>
                   </thead>
                   <tbody>

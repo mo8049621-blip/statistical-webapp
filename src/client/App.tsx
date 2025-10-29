@@ -1,7 +1,7 @@
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import StatisticsApp from './pages/StatisticsApp';
 
-// 创建一个完整的主题配置，确保包含所有必要的组件样式
+// Create a complete theme configuration ensuring all necessary component styles are included
 const theme = extendTheme({
   colors: {
     primary: '#3182ce',
@@ -12,7 +12,7 @@ const theme = extendTheme({
     body: 'Inter, system-ui, sans-serif',
   },
   components: {
-    // 确保Tabs组件有正确的样式配置
+    // Ensure Tabs component has correct style configuration
     Tabs: {
       baseStyle: {
         tab: {
@@ -26,7 +26,7 @@ const theme = extendTheme({
 });
 
 function App() {
-  // 简化App组件，确保ChakraProvider正确包裹所有组件
+  // Simplify App component and ensure ChakraProvider correctly wraps all components
   return (
     <ChakraProvider theme={theme}>
       <StatisticsApp />

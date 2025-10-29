@@ -9,7 +9,7 @@ import HypothesisTestingTab from '../components/HypothesisTestingTab';
 import SampleSizeCalculator from '../components/SampleSizeCalculator';
 import { calculateMean, calculateStd, calculateMedian, calculateSkewness, calculateKurtosis } from '../utils/statistics';
 
-// 定义数据集接口
+// Define dataset interface
 interface Dataset {
   id: string;
   name: string;
@@ -18,77 +18,97 @@ interface Dataset {
 }
 
 const StatisticsApp: React.FC = () => {
-  // 数据集状态管理
+  // Dataset state management
   const [dataset1, setDataset1] = useState<number[]>([]);
   const [dataset2, setDataset2] = useState<number[]>([]);
   const [pairedData, setPairedData] = useState<{sample1: number[], sample2: number[]}>({sample1: [], sample2: []});
   
-  // 数据已更新标志，用于提醒用户
+  // Data updated flag for user notification
   const [dataUpdated, setDataUpdated] = useState<boolean>(false);
   
-  // 标志数据集是否为系统生成
+  // Flag indicating if dataset is system generated
   const [isDatasetGenerated, setIsDatasetGenerated] = useState<boolean>(false);
   
-  // 存储数据集的分布信息
+  // Store dataset distribution information
   const [dataset1Distribution, setDataset1Distribution] = useState<{
     type: string;
     name: string;
     parameters: Record<string, number>;
   } | null>(null);
   
-  // 保存的数据集列表
+  // Saved datasets list
   const [savedDatasets, setSavedDatasets] = useState<Dataset[]>([]);
   
-  // 数据集名称输入
+  // Dataset name input
   const [datasetName, setDatasetName] = useState<string>('');
   
-  // 当前选择的数据集ID
+  // Currently selected dataset ID
   const [selectedDatasetId, setSelectedDatasetId] = useState<string | null>(null);
   
-  // 直接数据输入
+  // Direct data input
   const [directDataInput, setDirectDataInput] = useState<string>('');
   
-  // 计算当前使用数据集的基本统计量
+  // Get currently selected dataset
+  const getSelectedDataset = (id: string | null): number[] => {
+    if (!id) return [];
+    const dataset = savedDatasets.find(d => d.id === id);
+    return dataset ? dataset.data : [];
+  };
+
+  // Calculate basic statistics for the currently used dataset
   const currentDataset = useMemo(() => {
-    return selectedDatasetId ? getSelectedDataset(selectedDatasetId) : dataset1;
+    if (selectedDatasetId) {
+      const dataset = savedDatasets.find(d => d.id === selectedDatasetId);
+      return dataset ? dataset.data : [];
+    }
+    return dataset1;
   }, [selectedDatasetId, dataset1, savedDatasets]);
   
-  // 计算基本统计量
+  // Calculate basic statistics
   const basicStats = useMemo(() => {
-    if (currentDataset.length === 0) return null;
+    let datasetToAnalyze: number[] = [];
+    if (selectedDatasetId) {
+      const dataset = savedDatasets.find(d => d.id === selectedDatasetId);
+      datasetToAnalyze = dataset ? dataset.data : [];
+    } else {
+      datasetToAnalyze = dataset1;
+    }
+    
+    if (datasetToAnalyze.length === 0) return null;
     
     return {
-      mean: calculateMean(currentDataset),
-      std: calculateStd(currentDataset),
-      median: calculateMedian(currentDataset),
-      skewness: calculateSkewness(currentDataset),
-      kurtosis: calculateKurtosis(currentDataset),
-      count: currentDataset.length,
-      min: Math.min(...currentDataset),
-      max: Math.max(...currentDataset)
+      mean: calculateMean(datasetToAnalyze),
+      std: calculateStd(datasetToAnalyze),
+      median: calculateMedian(datasetToAnalyze),
+      skewness: calculateSkewness(datasetToAnalyze),
+      kurtosis: calculateKurtosis(datasetToAnalyze),
+      count: datasetToAnalyze.length,
+      min: Math.min(...datasetToAnalyze),
+      max: Math.max(...datasetToAnalyze)
     };
-  }, [currentDataset]);
+  }, [selectedDatasetId, savedDatasets, dataset1]);
+
   
-  // 判断数据是否可能来自正态分布（基于偏度和峰度的简单启发式规则）
+  // Determine if data might come from normal distribution (simple heuristic based on skewness and kurtosis)
   const isLikelyNormal = useMemo(() => {
     if (!basicStats || currentDataset.length < 30) return null;
     
-    // 偏度和峰度都在合理范围内，则可能为正态分布
+    // If skewness and kurtosis are within reasonable range, data might be normally distributed
     const skewnessWithinRange = Math.abs(basicStats.skewness) < 0.5;
     const kurtosisWithinRange = Math.abs(basicStats.kurtosis) < 0.5;
     
     return skewnessWithinRange && kurtosisWithinRange;
   }, [basicStats, currentDataset.length]);
 
-  // 处理数据生成事件
-  // 数据生成处理函数 - 已保留用于向后兼容
+  // Handle data generation event
+  // Data generation handler - preserved for backward compatibility
   
-  // 处理直接数据输入或上传（包含来源信息）
+  // Handle direct data input or upload (with source information)
   const handleDirectDataChange = (data: number[]) => {
     setDataset1(data);
     setDirectDataInput(data.join(', '));
-    setIsDatasetGenerated(false); // 标记为用户输入或上传的数据
-    setDataset1Distribution(null); // 清除分布信息
+    setIsDatasetGenerated(false); // Mark as user input or uploaded data
+    setDataset1Distribution(null); // Clear distribution information
     setPairedData({ sample1: [], sample2: [] });
     setDataUpdated(true);
     setTimeout(() => setDataUpdated(false), 3000);
@@ -132,12 +152,12 @@ const StatisticsApp: React.FC = () => {
     setTimeout(() => setDataUpdated(false), 3000);
   };
 
-  // 处理配对数据生成已移除，因为未使用
+  // Paired data generation handling removed as it's not used
   
-  // 处理直接数据输入
+  // Handle direct data input
   const handleDirectDataInput = () => {
     try {
-      // 解析数据
+      // Parse data
       const dataArray = directDataInput
         .split(/[\s,]+/)
         .filter(val => val.trim() !== '')
@@ -145,19 +165,19 @@ const StatisticsApp: React.FC = () => {
         .filter(val => !isNaN(val));
       
       if (dataArray.length === 0) {
-        throw new Error('请输入有效的数据');
+        throw new Error('Please enter valid data');
       }
       
       handleDirectDataChange(dataArray);
     } catch (error) {
-      alert(error instanceof Error ? error.message : '解析数据时发生错误');
+      alert(error instanceof Error ? error.message : 'Error parsing data');
     }
   };
   
-  // 保存数据集
+  // Save dataset
   const saveDataset = (data: number[], name: string) => {
     if (!name.trim()) {
-      alert('请输入数据集名称');
+      alert('Please enter dataset name');
       return;
     }
     
@@ -170,24 +190,17 @@ const StatisticsApp: React.FC = () => {
     
     setSavedDatasets([...savedDatasets, newDataset]);
     setDatasetName('');
-    alert('数据集保存成功！');
+    alert('Dataset saved successfully!');
   };
   
-  // 删除数据集
+  // Delete dataset
   const deleteDataset = (id: string) => {
     setSavedDatasets(savedDatasets.filter(dataset => dataset.id !== id));
-    // 如果删除的是当前选中的数据集，清除选择
+    // If deleting currently selected dataset, clear selection
     if (selectedDatasetId === id) setSelectedDatasetId(null);
   };
   
-  // 获取当前选中的数据集
-  const getSelectedDataset = (id: string | null): number[] => {
-    if (!id) return [];
-    const dataset = savedDatasets.find(d => d.id === id);
-    return dataset ? dataset.data : [];
-  };
-
-  // 选择历史数据集
+  // Select historical dataset
   const handleHistoryDatasetSelect = (id: string) => {
     const dataset = savedDatasets.find(d => d.id === id);
     if (dataset) {
@@ -196,8 +209,8 @@ const StatisticsApp: React.FC = () => {
       setSelectedDatasetId(id);
       setDataset2([]);
       setPairedData({ sample1: [], sample2: [] });
-      setIsDatasetGenerated(false); // 历史数据集默认为用户数据
-      setDataset1Distribution(null); // 清除分布信息
+      setIsDatasetGenerated(false); // Historical datasets default to user data
+      setDataset1Distribution(null); // Clear distribution information
       setDataUpdated(true);
       setTimeout(() => setDataUpdated(false), 3000);
     }
@@ -206,10 +219,10 @@ const StatisticsApp: React.FC = () => {
   return (
     <Container maxW="container.lg" py={4}>
       <Heading as="h1" size="lg" mb={4} textAlign="center">
-        统计分析工具
+        Statistical Analysis Tool
       </Heading>
       
-      {/* 统一数据输入和生成区域 */}
+      {/* Unified data input and generation area */}
       <Box 
         mb={6} 
         bg="white" 
@@ -218,43 +231,43 @@ const StatisticsApp: React.FC = () => {
         boxShadow="0 2px 4px rgba(0,0,0,0.1)"
       >
         <Heading as="h2" size="md" mb={3} color="blue.600">
-          数据输入与生成
-        </Heading>
+            Data Input & Generation
+          </Heading>
         
         <Tabs isFitted>
           <TabList mb={3}>
-            <Tab>数据上传</Tab>
-            <Tab>数据生成</Tab>
-            <Tab>历史数据</Tab>
+            <Tab>Data Upload</Tab>
+            <Tab>Data Generation</Tab>
+            <Tab>History Data</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
               <Box p={4}>
                 <Heading as="h3" size="sm" mb={3} color="blue.700">
-                  直接输入数据
+                  Direct Data Input
                 </Heading>
                 <Stack spacing={3} mb={6}>
                   <Textarea
                     value={directDataInput}
                     onChange={(e) => setDirectDataInput(e.target.value)}
-                    placeholder="例如: 1.2 3.4 5.6 7.8 9.0"
+                    placeholder="e.g., 1.2 3.4 5.6 7.8 9.0"
                     size="md"
                     height="100px"
                     resize="vertical"
                   />
                   <Button onClick={handleDirectDataInput} colorScheme="blue" width="100%">
-                    应用数据
+                    Apply Data
                   </Button>
                 </Stack>
                 
                 <Heading as="h3" size="sm" mb={3} color="blue.700">
-                  CSV文件上传
+                  CSV File Upload
                 </Heading>
                 <FileUploader 
                   onDataChange={(data, distributionInfo) => {
                     handleDirectDataChange(data);
                     
-                    // 如果有分布信息，更新分布状态
+                    // Update distribution state if there's distribution information
                     if (distributionInfo && distributionInfo.type) {
                       setDataset1Distribution({
                         type: distributionInfo.type,
@@ -273,13 +286,13 @@ const StatisticsApp: React.FC = () => {
             <TabPanel>
               <Box p={4}>
                 <Heading as="h3" size="sm" mb={3} color="blue.700">
-                  样本生成类型
+                  Sample Generation Type
                 </Heading>
                 <Tabs variant="enclosed" mb={4}>
                   <TabList>
-                    <Tab>单样本</Tab>
-                    <Tab>两样本</Tab>
-                    <Tab>配对样本</Tab>
+                    <Tab>Single Sample</Tab>
+                    <Tab>Two Samples</Tab>
+                    <Tab>Paired Samples</Tab>
                   </TabList>
                   <TabPanels>
                     <TabPanel>
@@ -293,8 +306,8 @@ const StatisticsApp: React.FC = () => {
                       <Stack spacing={6}>
                         <Box>
                           <Heading as="h3" size="sm" mb={3} color="blue.700">
-                            样本1生成
-                          </Heading>
+                          Sample 1 Generation
+                        </Heading>
                           <DistributionGenerator 
                             onDataChange={(data, distributionInfo) => {
                               handleDataset1Change(data, distributionInfo);
@@ -303,8 +316,8 @@ const StatisticsApp: React.FC = () => {
                         </Box>
                         <Box>
                           <Heading as="h3" size="sm" mb={3} color="blue.700">
-                            样本2生成
-                          </Heading>
+                          Sample 2 Generation
+                        </Heading>
                           <DistributionGenerator 
                             onDataChange={(data) => {
                               handleDataset2Change(data);
@@ -317,8 +330,8 @@ const StatisticsApp: React.FC = () => {
                       <Stack spacing={6}>
                         <Box>
                           <Heading as="h3" size="sm" mb={3} color="blue.700">
-                            前测数据生成
-                          </Heading>
+                          Pre-test Data Generation
+                        </Heading>
                           <DistributionGenerator 
                             onDataChange={(data, distributionInfo) => {
                               handlePairedDataChange(data, pairedData.sample2, distributionInfo);
@@ -327,8 +340,8 @@ const StatisticsApp: React.FC = () => {
                         </Box>
                         <Box>
                           <Heading as="h3" size="sm" mb={3} color="blue.700">
-                            后测数据生成
-                          </Heading>
+                          Post-test Data Generation
+                        </Heading>
                           <DistributionGenerator 
                             onDataChange={(data, distributionInfo) => {
                               handlePairedDataChange(pairedData.sample1, data, distributionInfo);
@@ -343,19 +356,19 @@ const StatisticsApp: React.FC = () => {
             </TabPanel>
             <TabPanel>
               <Stack spacing={3}>
-                {/* 提示用户在数据集管理区域保存 */}
+                {/* Prompt user to save in dataset management area */}
                 {dataset1.length > 0 && (
                   <Alert status="info" mb={3} size="sm">
                     <AlertIcon />
-                    您可以在下方的「数据集管理」区域保存和管理当前数据集
+                    You can save and manage current dataset in the 'Dataset Management' section below
                   </Alert>
                 )}
                 
-                {/* 历史数据集列表 */}
+                {/* History datasets list */}
                 <Box>
-                  <Text fontSize="sm" mb={2} fontWeight="medium">选择历史数据集:</Text>
+                  <Text fontSize="sm" mb={2} fontWeight="medium">Select History Dataset:</Text>
                   {savedDatasets.length === 0 ? (
-                    <Text fontSize="sm" color="gray.500">暂无保存的数据集</Text>
+                    <Text fontSize="sm" color="gray.500">No saved datasets yet</Text>
                   ) : (
                     <Box maxHeight="200px" overflowY="auto" borderWidth={1} borderColor="gray.200" borderRadius="lg">
                       {savedDatasets.map(dataset => (
@@ -377,7 +390,7 @@ const StatisticsApp: React.FC = () => {
                             />
                             <div>
                               <Text fontSize="sm" fontWeight="medium">{dataset.name}</Text>
-                              <Text fontSize="xs" color="gray.500">{dataset.data.length}个观测值</Text>
+                              <Text fontSize="xs" color="gray.500">{dataset.data.length} observations</Text>
                             </div>
                           </div>
                           <Button 
@@ -385,7 +398,7 @@ const StatisticsApp: React.FC = () => {
                             colorScheme="red" 
                             onClick={() => deleteDataset(dataset.id)}
                           >
-                            删除
+                            Delete
                           </Button>
                         </Box>
                       ))}
@@ -400,7 +413,7 @@ const StatisticsApp: React.FC = () => {
       
       <Divider my={4} />
       
-      {/* 数据集管理区域 - 移到数据分析区域之前 */}
+      {/* Dataset Management Section - Moved before analysis section */}
       <Box 
         bg="white" 
         p={4} 
@@ -409,43 +422,43 @@ const StatisticsApp: React.FC = () => {
         mb={4}
       >
         <Heading as="h2" size="md" mb={3} color="blue.600">
-          数据集管理
+          Dataset Management
         </Heading>
         
-        {/* 数据更新提示 */}
+        {/* Data Update Notification */}
         {dataUpdated && (
           <Alert status="success" mb={4} size="sm">
             <AlertIcon />
-            数据已更新，可以开始分析或保存
+            Data has been updated. You can start analysis or save
           </Alert>
         )}
         
-        {/* 保存当前数据集功能 */}
+        {/* Save Current Dataset Function */}
         {dataset1.length > 0 && (
           <Box mb={4} p={3} borderWidth={1} borderColor="blue.200" borderRadius="lg" bg="blue.50">
-            <Text fontSize="sm" fontWeight="medium" mb={2}>保存当前生成的数据集:</Text>
+            <Text fontSize="sm" fontWeight="medium" mb={2}>Save current generated dataset:</Text>
             <Stack direction="row" gap={2}>
               <Input 
                 value={datasetName} 
                 onChange={(e) => setDatasetName(e.target.value)} 
-                placeholder="输入数据集名称" 
+                placeholder="Enter dataset name" 
                 size="md"
                 flex={1}
               />
               <Button 
                 colorScheme="blue" 
-                onClick={() => saveDataset(dataset1, datasetName || `数据集_${new Date().toLocaleTimeString()}`)}
+                onClick={() => saveDataset(dataset1, datasetName || `Dataset_${new Date().toLocaleTimeString()}`)}
               >
-                保存数据集
+                Save Dataset
               </Button>
             </Stack>
           </Box>
         )}
         
-        {/* 已保存数据集列表和选择功能 */}
+        {/* Saved Datasets List and Selection Function */}
         {savedDatasets.length > 0 && (
           <Box>
-            <Text fontSize="sm" fontWeight="medium" mb={2}>选择要分析的数据集:</Text>
+            <Text fontSize="sm" fontWeight="medium" mb={2}>Select dataset for analysis:</Text>
             <Box maxHeight={200} overflowY="auto" borderWidth={1} borderColor="gray.200" borderRadius="lg">
               {savedDatasets.map(dataset => (
                 <Box 
@@ -461,14 +474,12 @@ const StatisticsApp: React.FC = () => {
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Checkbox
                       isChecked={selectedDatasetId === dataset.id}
-                      onChange={() => setSelectedDatasetId(
-                        selectedDatasetId === dataset.id ? null : dataset.id
-                      )}
+                      onChange={() => handleHistoryDatasetSelect(dataset.id)}
                       mr={2}
                     />
                     <div>
                       <Text fontSize="sm" fontWeight="medium">{dataset.name}</Text>
-                      <Text fontSize="xs" color="gray.500">{dataset.data.length}个观测值 · {new Date(dataset.timestamp).toLocaleString()}</Text>
+                      <Text fontSize="xs" color="gray.500">{dataset.data.length} observations · {new Date(dataset.timestamp).toLocaleString()}</Text>
                     </div>
                   </div>
                   <Button 
@@ -476,7 +487,7 @@ const StatisticsApp: React.FC = () => {
                     colorScheme="red" 
                     onClick={() => deleteDataset(dataset.id)}
                   >
-                    删除
+                    Delete
                   </Button>
                 </Box>
               ))}
@@ -484,24 +495,24 @@ const StatisticsApp: React.FC = () => {
           </Box>
         )}
         
-        {/* 当前选中数据集信息 */}
+        {/* Currently Selected Dataset Information */}
         {selectedDatasetId && (
           <Box mt={3} p={3} borderWidth={1} borderColor="green.200" borderRadius="lg" bg="green.50">
-            <Text fontSize="sm" fontWeight="medium">当前选中的数据集:</Text>
+            <Text fontSize="sm" fontWeight="medium">Currently selected dataset:</Text>
             <Text fontSize="sm">{savedDatasets.find(d => d.id === selectedDatasetId)?.name}</Text>
-            <Text fontSize="sm">数据点数量: {getSelectedDataset(selectedDatasetId).length}</Text>
+            <Text fontSize="sm">Number of data points: {getSelectedDataset(selectedDatasetId).length}</Text>
           </Box>
         )}
         
         {savedDatasets.length === 0 && (
           <Alert status="info" mb={4} size="sm">
             <AlertIcon />
-            暂无保存的数据集，生成数据后可以保存
+            No saved datasets yet. Generate data to save
           </Alert>
         )}
       </Box>
       
-      {/* 分析区域 */}
+      {/* Analysis Section */}
       <Box 
         bg="white" 
         p={4} 
@@ -509,40 +520,40 @@ const StatisticsApp: React.FC = () => {
         boxShadow="0 2px 4px rgba(0,0,0,0.1)"
       >
         <Heading as="h2" size="md" mb={3} color="blue.600">
-          统计分析
+          Statistical Analysis
         </Heading>
         
-        {/* 显示当前使用的数据集信息和基本统计量 */}
+        {/* Display Current Dataset Information and Basic Statistics */}
         {(currentDataset.length > 0) && (
           <Box mb={4} p={3} borderWidth={1} borderColor="green.200" borderRadius="lg" bg="green.50">
-            <Text fontSize="sm" fontWeight="medium">当前使用的数据集:</Text>
+            <Text fontSize="sm" fontWeight="medium">Currently using dataset:</Text>
             {selectedDatasetId ? (
-              <Text fontSize="sm">名称: {savedDatasets.find(d => d.id === selectedDatasetId)?.name}</Text>
+              <Text fontSize="sm">Name: {savedDatasets.find(d => d.id === selectedDatasetId)?.name}</Text>
             ) : null}
             
             {basicStats && (
               <Box mt={2}>
                 <Grid gridTemplateColumns="repeat(2, 1fr)" gap={2}>
-                  <Text fontSize="sm">数据点数量: {basicStats.count}</Text>
-                  <Text fontSize="sm">均值: {basicStats.mean.toFixed(4)}</Text>
-                  <Text fontSize="sm">标准差: {basicStats.std.toFixed(4)}</Text>
-                  <Text fontSize="sm">中位数: {basicStats.median.toFixed(4)}</Text>
-                  <Text fontSize="sm">最小值: {basicStats.min.toFixed(4)}</Text>
-                  <Text fontSize="sm">最大值: {basicStats.max.toFixed(4)}</Text>
+                  <Text fontSize="sm">Count: {basicStats.count}</Text>
+                  <Text fontSize="sm">Mean: {basicStats.mean.toFixed(4)}</Text>
+                  <Text fontSize="sm">Standard Deviation: {basicStats.std.toFixed(4)}</Text>
+                  <Text fontSize="sm">Median: {basicStats.median.toFixed(4)}</Text>
+                  <Text fontSize="sm">Minimum: {basicStats.min.toFixed(4)}</Text>
+                  <Text fontSize="sm">Maximum: {basicStats.max.toFixed(4)}</Text>
                   {basicStats.count >= 30 && (
                     <>
-                      <Text fontSize="sm">偏度: {basicStats.skewness.toFixed(4)}</Text>
-                      <Text fontSize="sm">峰度: {basicStats.kurtosis.toFixed(4)}</Text>
+                      <Text fontSize="sm">Skewness: {basicStats.skewness.toFixed(4)}</Text>
+                      <Text fontSize="sm">Kurtosis: {basicStats.kurtosis.toFixed(4)}</Text>
                     </>
                   )}
                 </Grid>
                 
-                {/* 数据分布提示 */}
+                {/* Data Distribution Hint */}
                 {!isDatasetGenerated && !dataset1Distribution && isLikelyNormal !== null && (
                   <Text fontSize="sm" mt={2} color={isLikelyNormal ? "blue.600" : "orange.600"}>
-                    数据分布提示: {isLikelyNormal 
-                      ? "数据可能服从正态分布，统计分析可考虑使用参数方法"
-                      : "数据可能不服从正态分布，建议进行分布检验或使用非参数方法"
+                    Data Distribution Hint: {isLikelyNormal 
+                      ? "Data likely follows normal distribution, parametric methods can be considered for statistical analysis"
+                      : "Data may not follow normal distribution, distribution testing or non-parametric methods are recommended"
                     }
                   </Text>
                 )}
@@ -551,14 +562,14 @@ const StatisticsApp: React.FC = () => {
           </Box>
         )}
         
-        {/* 使用Tabs组织不同的分析功能 - 注意避免之前的Context错误问题 */}
+        {/* Tabs for different analysis functions */}
         <Tabs isFitted variant="enclosed">
           <TabList mb={4}>
-            <Tab>基本统计分析</Tab>
-            <Tab>置信区间</Tab>
+            <Tab>Basic Statistics</Tab>
+            <Tab>Confidence Intervals</Tab>
             <Tab>MLE & MOM</Tab>
-            <Tab>假设检验</Tab>
-            <Tab>样本量计算</Tab>
+            <Tab>Hypothesis Testing</Tab>
+            <Tab>Sample Size Calculation</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -579,15 +590,22 @@ const StatisticsApp: React.FC = () => {
           </TabPanel>
             <TabPanel>
               <MLEMoMTab 
-              dataset={currentDataset}
-              distribution={!selectedDatasetId && dataset1Distribution?.type || ''}
-            />
-          </TabPanel>
+                dataset={currentDataset}
+                distribution={!selectedDatasetId ? dataset1Distribution : null}
+                isGeneratedDataset={!selectedDatasetId}
+                basicStats={basicStats}
+              />
+            </TabPanel>
             <TabPanel>
               <HypothesisTestingTab 
-              dataset={currentDataset}
-            />
-          </TabPanel>
+                dataset={currentDataset}
+                dataset2={dataset2}
+                pairedData={pairedData && pairedData.sample1.length > 0 && pairedData.sample2.length > 0 ? {before: pairedData.sample1, after: pairedData.sample2} : undefined}
+                isGeneratedDataset={!selectedDatasetId}
+                distributionInfo={dataset1Distribution}
+                basicStats={basicStats}
+              />
+            </TabPanel>
             <TabPanel>
               <SampleSizeCalculator 
                 basicStats={basicStats}
@@ -597,11 +615,11 @@ const StatisticsApp: React.FC = () => {
         </Tabs>
       </Box>
       
-      {/* 如果没有数据集，显示提示 */}
+      {/* If no dataset, display hint */}
       {dataset1.length === 0 && (
         <Alert status="info" mb={4} size="sm">
           <AlertIcon />
-          请先使用上方数据生成器生成数据
+          Please generate data first using the data generator above
         </Alert>
       )}
     </Container>

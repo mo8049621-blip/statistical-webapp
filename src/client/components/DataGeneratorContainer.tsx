@@ -22,12 +22,12 @@ interface DataGeneratorContainerProps {
 function DataGeneratorContainer({ onDataGenerated, onPairedDataGenerated, onDirectDataChange }: DataGeneratorContainerProps) {
   const [activeTab, setActiveTab] = useState<'single' | 'two' | 'paired'>('single');
 
-  // 处理单样本数据生成
+  // Handle single sample data generation
   const handleSingleDataGenerated = (data: any, distributionInfo?: any) => {
     onDataGenerated({ data, distributionInfo }, 1);
   };
 
-  // 处理两样本数据生成
+  // Handle two sample data generation
   const handleTwoSampleDataGenerated = (data: { sample1: number[]; sample2: number[] }) => {
     if (data?.sample1 && data?.sample2) {
       onDataGenerated({ data: data.sample1 }, 1);
@@ -35,7 +35,7 @@ function DataGeneratorContainer({ onDataGenerated, onPairedDataGenerated, onDire
     }
   };
 
-  // 处理配对数据生成
+  // Handle paired data generation
   const handlePairedDataGenerated = (data: { before: number[]; after: number[]; params?: any }) => {
     if (data?.before && data?.after) {
       onPairedDataGenerated(data.before, data.after);
@@ -47,16 +47,16 @@ function DataGeneratorContainer({ onDataGenerated, onPairedDataGenerated, onDire
   return (
     <Card mb={6}>
       <CardBody>
-        <Text fontSize="lg" fontWeight="medium" mb={4}>数据生成</Text>
+        <Text fontSize="lg" fontWeight="medium" mb={4}>Data Generation</Text>
         
         <Box borderBottomWidth="1px" borderBottomColor="gray.200" mb={4}>
           <Tabs 
             index={activeTab === 'single' ? 0 : activeTab === 'two' ? 1 : 2}
             onChange={(index) => setActiveTab(index === 0 ? 'single' : index === 1 ? 'two' : 'paired')}
           >
-            <Tab px={4} py={2}>单样本数据</Tab>
-            <Tab px={4} py={2}>两样本数据</Tab>
-            <Tab px={4} py={2}>配对数据</Tab>
+            <Tab px={4} py={2}>Single Sample Data</Tab>
+            <Tab px={4} py={2}>Two Sample Data</Tab>
+            <Tab px={4} py={2}>Paired Data</Tab>
           </Tabs>
         </Box>
 
@@ -64,10 +64,10 @@ function DataGeneratorContainer({ onDataGenerated, onPairedDataGenerated, onDire
           <DistributionGenerator 
             onDataChange={(data) => {
               if (onDirectDataChange) {
-                // 对于文件上传等直接数据输入，使用专门的处理函数
+                // For direct data input like file upload, use specialized handling functions
                 onDirectDataChange(data);
               } else {
-                // 向后兼容
+                // Backward compatibility
                 handleSingleDataGenerated(data);
               }
             }}

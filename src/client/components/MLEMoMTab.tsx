@@ -1,23 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Box, Text, Card, CardBody, Grid, Select, Button, Alert, AlertIcon, AlertDescription } from '@chakra-ui/react';
 import { calculateMLE, calculateMoM } from '../utils/statistics';
-import { EstimationResult, BasicStats } from '../types';
+import { EstimationResult, MLEMoMTabProps } from '../types';
 
-interface MLEMoMTabProps {
-  dataset: number[];
-  distribution: string;
-}
-
-function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { basicStats?: BasicStats | null }) {
+function MLEMoMTab({ dataset, distribution, basicStats, isGeneratedDataset }: MLEMoMTabProps) {
   const [selectedDistribution, setSelectedDistribution] = useState<string>('normal');
   const [estimationResults, setEstimationResults] = useState<EstimationResult[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const isGeneratedDataset = !!distribution;
 
   useEffect(() => {
-    // 当数据集或分布变化时，自动更新选择的分布
+    // Automatically update selected distribution when dataset or distribution changes
     if (distribution && dataset.length > 0) {
-      setSelectedDistribution(distribution);
+      setSelectedDistribution(distribution.type || 'normal');
       handleEstimate();
     }
   }, [dataset, distribution, basicStats]);
@@ -28,7 +22,7 @@ function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { bas
 
   const handleEstimate = () => {
     if (dataset.length === 0) {
-      setError('请先导入或生成数据');
+      setError('Please import or generate data first');
       return;
     }
 
@@ -36,34 +30,34 @@ function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { bas
     const results: EstimationResult[] = [];
 
     try {
-      // 计算MLE估计
+      // Calculate MLE estimates
       const mleParams = calculateMLE(dataset, selectedDistribution, basicStats);
       results.push({
-        method: '极大似然估计 (MLE)',
+        method: 'Maximum Likelihood Estimation (MLE)',
         params: mleParams
       });
 
-      // 计算MoM估计
+      // Calculate MoM estimates
       const momParams = calculateMoM(dataset, selectedDistribution, basicStats);
       results.push({
-        method: '矩估计法 (MoM)',
+        method: 'Method of Moments (MoM)',
         params: momParams
       });
 
       setEstimationResults(results);
     } catch (err) {
-      setError(`估计计算失败: ${err instanceof Error ? err.message : '未知错误'}`);
+      setError(`Estimation calculation failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
-  // 分布选项
+  // Distribution options
   const distributionOptions = [
-    { value: 'normal', label: '正态分布' },
-    { value: 'exponential', label: '指数分布' },
-    { value: 'gamma', label: '伽马分布' },
-    { value: 'beta', label: '贝塔分布' },
-    { value: 'poisson', label: '泊松分布' },
-    { value: 'uniform', label: '均匀分布' }
+    { value: 'normal', label: 'Normal Distribution' },
+    { value: 'exponential', label: 'Exponential Distribution' },
+    { value: 'gamma', label: 'Gamma Distribution' },
+    { value: 'beta', label: 'Beta Distribution' },
+    { value: 'poisson', label: 'Poisson Distribution' },
+    { value: 'uniform', label: 'Uniform Distribution' }
   ];
 
   return (
@@ -72,12 +66,12 @@ function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { bas
         <Box>
           <Card>
             <CardBody>
-              <Text fontSize="lg" fontWeight="bold" mb={4}>参数估计</Text>
+              <Text fontSize="lg" fontWeight="bold" mb={4}>Parameter Estimation</Text>
               
-              {/* 仅当分布未知时显示手动选择选项 */}
+              {/* Only show manual selection option when distribution is unknown */}
               {!isGeneratedDataset ? (
                 <Box mb={4}>
-                  <Text mb={2}>选择分布类型：</Text>
+                  <Text mb={2}>Select Distribution Type:</Text>
                   <Select
                     value={selectedDistribution}
                     onChange={handleDistributionChange}
@@ -92,10 +86,16 @@ function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { bas
                 </Box>
               ) : distribution ? (
                 <Box mb={4} bg="blue.50" p={4} borderRadius="md">
-                  <Text fontWeight="medium" mb={2}>自动检测结果：</Text>
-                  <Text fontSize="sm" mb={1}>分布类型：{distribution}</Text>
+                  <Text fontWeight="medium" mb={2}>Auto-detection Result:</Text>
+                  <Text fontSize="sm" mb={1}>Distribution Type: {distribution.name}</Text>
+                  {distribution.parameters && Object.entries(distribution.parameters).length > 0 && (
+                    <Text fontSize="sm" mt={1}>Parameters: {Object.entries(distribution.parameters)
+                      .map(([key, value]) => `${key}: ${value}`)
+                      .join(', ')}
+                    </Text>
+                  )}
                   <Text fontSize="sm" mt={2} color="blue.700">
-                    使用{distribution}进行极大似然估计和矩估计
+                    Using {distribution.name} for Maximum Likelihood Estimation and Method of Moments
                   </Text>
                 </Box>
               ) : null}
@@ -105,7 +105,7 @@ function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { bas
                 width="full"
                 onClick={handleEstimate}
               >
-                执行估计
+                Perform Estimation
               </Button>
             </CardBody>
           </Card>
@@ -148,7 +148,7 @@ function MLEMoMTab({ dataset, distribution, basicStats }: MLEMoMTabProps & { bas
           {estimationResults.length === 0 && !error && (
             <Alert status="info">
               <AlertIcon />
-              <AlertDescription>请选择分布类型并点击"执行估计"按钮</AlertDescription>
+              <AlertDescription>Please select a distribution type and click the 'Perform Estimation' button</AlertDescription>
             </Alert>
           )}
         </Box>

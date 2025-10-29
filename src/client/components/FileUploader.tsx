@@ -2,21 +2,21 @@ import { useState, useRef } from 'react';
 import { Box, Button, Text, Alert, AlertIcon, AlertDescription, Progress } from '@chakra-ui/react';
 import { FileUploaderProps } from '../types';
 
-// 用于处理Excel文件的简单解析函数（简化版，实际项目中可考虑使用xlsx库）
+// Simple parsing function for Excel files (simplified version, consider using xlsx library in actual projects)
 const parseExcelLike = (content: string): number[] => {
-  // Excel文件通常以制表符分隔
+  // Excel files are usually tab-separated
   const lines = content.split(/\r\n|\n/).filter((line) => line.trim());
   const data: number[] = [];
 
-  // 检查是否有表头
+  // Check if there is a header
   const firstLineNumbers = lines[0].split(/\t|,/).map((item) => parseFloat(item.trim()));
   const hasHeader = firstLineNumbers.some((num) => isNaN(num));
 
-  // 从适当的行开始解析数据
+  // Start parsing data from the appropriate line
   const startLine = hasHeader ? 1 : 0;
 
   for (let i = startLine; i < lines.length; i++) {
-    // 支持制表符或逗号分隔
+    // Support tab or comma separation
     const values = lines[i].split(/\t|,/);
     
     for (const value of values) {
@@ -33,19 +33,19 @@ const parseExcelLike = (content: string): number[] => {
   return data;
 };
 
-// 用于处理JSON文件的解析函数
+// Parsing function for JSON files
 const parseJSON = (content: string): number[] => {
   try {
     const parsed = JSON.parse(content);
     const data: number[] = [];
     
-    // 处理数组
+    // Process array
     if (Array.isArray(parsed)) {
-      // 扁平数组
+      // Flat array
       if (parsed.length > 0 && typeof parsed[0] === 'number') {
         return parsed.filter(val => !isNaN(val));
       }
-      // 对象数组，尝试提取数值字段
+      // Object array, try to extract numeric fields
       else {
         parsed.forEach(item => {
           if (typeof item === 'object' && item !== null) {
@@ -60,7 +60,7 @@ const parseJSON = (content: string): number[] => {
         });
       }
     }
-    // 处理对象
+    // Process object
     else if (typeof parsed === 'object' && parsed !== null) {
       Object.values(parsed).forEach(val => {
         if (typeof val === 'number' && !isNaN(val)) {
@@ -71,7 +71,7 @@ const parseJSON = (content: string): number[] => {
     
     return data;
   } catch (error) {
-    throw new Error('JSON解析失败，请确保文件格式正确');
+    throw new Error('JSON parsing failed, please ensure the file format is correct');
   }
 };
 
@@ -89,7 +89,7 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
     setErrorMessage('');
     setUploadProgress(0);
 
-    // 模拟上传进度
+    // Simulate upload progress
     const progressInterval = setInterval(() => {
       setUploadProgress((prevProgress) => {
         const newProgress = prevProgress + 20;
@@ -102,7 +102,7 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
       });
     }, 200);
 
-    // 重置文件输入，以便可以重复上传同一个文件
+    // Reset file input to allow uploading the same file again
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -119,7 +119,7 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
         let fileType = 'unknown';
         let fileName = file.name;
 
-        // 根据文件扩展名选择相应的解析方法
+        // Select the appropriate parsing method based on file extension
         switch (fileExtension) {
           case 'csv':
             data = parseCSV(content);
@@ -130,23 +130,23 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
             fileType = 'json';
             break;
           case 'txt':
-            // 尝试用CSV解析器解析文本文件
+            // Try to parse text file with CSV parser
             data = parseExcelLike(content);
             fileType = 'txt';
             break;
           case 'xlsx':
           case 'xls':
-            // 注意：这里是简化实现，实际项目中应使用专业的Excel解析库
-            // 这里我们假设Excel文件内容已经被转换为文本形式
+            // Note: This is a simplified implementation, use professional Excel parsing library in actual projects
+            // Here we assume the Excel file content has been converted to text form
             data = parseExcelLike(content);
             fileType = 'excel';
             break;
           default:
-            throw new Error('不支持的文件格式，请上传CSV、JSON、TXT或Excel文件');
+            throw new Error('Unsupported file format, please upload CSV, JSON, TXT or Excel files');
         }
         
         if (data.length === 0) {
-          throw new Error('文件中未找到有效的数值数据');
+          throw new Error('No valid numerical data found in the file');
         }
 
         onDataChange(data, {
@@ -155,25 +155,25 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
         });
       } catch (error) {
         setErrorMessage(
-          error instanceof Error ? error.message : '处理文件时发生错误'
+          error instanceof Error ? error.message : 'Error processing file'
         );
       }
     };
 
     reader.onerror = () => {
-      setErrorMessage('读取文件时发生错误');
+      setErrorMessage('Error reading file');
     };
 
-    // 对于文本类文件，使用readAsText
+    // For text files, use readAsText
     if (['csv', 'json', 'txt'].includes(fileExtension || '')) {
       reader.readAsText(file);
     } else if (['xlsx', 'xls'].includes(fileExtension || '')) {
-      // 注意：这里是简化实现，实际项目中应使用专业的Excel解析库
-      // 这里我们假设Excel文件可以通过文本方式读取（实际上这不适用于二进制Excel文件）
+      // Note: This is a simplified implementation, use professional Excel parsing library in actual projects
+      // Here we assume Excel files can be read as text (which is not actually applicable for binary Excel files)
       reader.readAsText(file);
-      // 在真实项目中，这里应该使用：
+      // In a real project, you should use:
       // reader.readAsArrayBuffer(file);
-      // 然后使用如xlsx库来解析二进制数据
+      // Then use libraries like xlsx to parse binary data
     }
   };
 
@@ -181,11 +181,11 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
     const lines = content.split(/\r\n|\n/).filter((line) => line.trim());
     const data: number[] = [];
 
-    // 检查是否有表头
+    // Check if there is a header
     const firstLineNumbers = lines[0].split(',').map((item) => parseFloat(item.trim()));
     const hasHeader = firstLineNumbers.some((num) => isNaN(num));
 
-    // 从适当的行开始解析数据
+    // Start parsing data from the appropriate line
     const startLine = hasHeader ? 1 : 0;
 
     for (let i = startLine; i < lines.length; i++) {
@@ -225,22 +225,22 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
         variant="solid"
         size="lg"
       >
-        上传CSV文件
+        Upload CSV File
       </Button>
 
       {uploadProgress > 0 && uploadProgress < 100 && (
         <Box mt={4}>
           <Progress value={uploadProgress} width="100%" />
           <Text fontSize="sm" mt={1} color="gray.500">
-            处理中... {uploadProgress}%
+            Processing... {uploadProgress}%
           </Text>
         </Box>
       )}
 
       {selectedFileName && uploadProgress === 100 && (
         <Text mt={4} color="green.600">
-          已成功上传: {selectedFileName}
-        </Text>
+            Successfully uploaded: {selectedFileName}
+          </Text>
       )}
 
       {errorMessage && (
@@ -252,12 +252,12 @@ function FileUploader({ onDataChange }: FileUploaderProps) {
 
       <Box mt={6} p={4} bg="gray.50" borderRadius="md">
         <Text fontSize="sm" color="gray.600">
-          <strong>使用说明:</strong>
-          <br />• 支持CSV、JSON、TXT和Excel (.xlsx, .xls)格式文件
-          <br />• 文件可以包含或不包含表头
-          <br />• 数据可以是单列或多列
-          <br />• 仅提取数值数据进行分析
-          <br />• 对于JSON文件，支持数值数组或包含数值字段的对象数组
+          <strong>Instructions:</strong>
+          <br />• Supports CSV, JSON, TXT and Excel (.xlsx, .xls) file formats
+          <br />• Files can include or exclude headers
+          <br />• Data can be single-column or multi-column
+          <br />• Only numerical data is extracted for analysis
+          <br />• For JSON files, numerical arrays or object arrays with numerical fields are supported
         </Text>
       </Box>
     </Box>

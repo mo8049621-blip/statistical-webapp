@@ -8,57 +8,57 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
   const [params, setParams] = useState<Record<string, number>>({});
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  // 定义各种分布的配置
+  // Define configurations for various distributions
   const distributionConfigs: Record<string, DistributionConfig> = {
     normal: {
-      name: '正态分布',
+      name: 'Normal Distribution',
       params: [
-        { name: 'mean', label: '均值 (μ)', min: -100, max: 100, step: 0.1, defaultValue: 0 },
-        { name: 'std', label: '标准差 (σ)', min: 0.1, max: 20, step: 0.1, defaultValue: 1 },
+        { name: 'mean', label: 'Mean (μ)', min: -100, max: 100, step: 0.1, defaultValue: 0 },
+        { name: 'std', label: 'Standard Deviation (σ)', min: 0.1, max: 20, step: 0.1, defaultValue: 1 },
       ],
       formula: 'f(x) = (1/(σ√(2π))) * e^(-(x-μ)²/(2σ²))',
     },
     uniform: {
-      name: '均匀分布',
+      name: 'Uniform Distribution',
       params: [
-        { name: 'a', label: '最小值 (a)', min: -100, max: 100, step: 0.1, defaultValue: 0 },
-        { name: 'b', label: '最大值 (b)', min: -100, max: 100, step: 0.1, defaultValue: 1 },
+        { name: 'a', label: 'Minimum Value (a)', min: -100, max: 100, step: 0.1, defaultValue: 0 },
+        { name: 'b', label: 'Maximum Value (b)', min: -100, max: 100, step: 0.1, defaultValue: 1 },
       ],
-      formula: 'f(x) = 1/(b-a) 当 a ≤ x ≤ b 时',
+      formula: 'f(x) = 1/(b-a) for a ≤ x ≤ b',
     },
     binomial: {
-      name: '二项分布',
+      name: 'Binomial Distribution',
       params: [
-        { name: 'n', label: '试验次数 (n)', min: 1, max: 100, step: 1, defaultValue: 10 },
-        { name: 'p', label: '成功概率 (p)', min: 0.1, max: 0.9, step: 0.01, defaultValue: 0.5 },
+        { name: 'n', label: 'Number of Trials (n)', min: 1, max: 100, step: 1, defaultValue: 10 },
+        { name: 'p', label: 'Success Probability (p)', min: 0.1, max: 0.9, step: 0.01, defaultValue: 0.5 },
       ],
       formula: 'P(k) = C(n,k) * p^k * (1-p)^(n-k)',
     },
     poisson: {
-      name: '泊松分布',
+      name: 'Poisson Distribution',
       params: [
-        { name: 'lambda', label: 'λ 参数', min: 0.1, max: 20, step: 0.1, defaultValue: 5 },
+        { name: 'lambda', label: 'λ Parameter', min: 0.1, max: 20, step: 0.1, defaultValue: 5 },
       ],
       formula: 'P(k) = (e^(-λ) * λ^k) / k!',
     },
     exponential: {
-      name: '指数分布',
+      name: 'Exponential Distribution',
       params: [
-        { name: 'lambda', label: 'λ 参数', min: 0.1, max: 5, step: 0.1, defaultValue: 1 },
+        { name: 'lambda', label: 'λ Parameter', min: 0.1, max: 5, step: 0.1, defaultValue: 1 },
       ],
-      formula: 'f(x) = λ * e^(-λx) 当 x ≥ 0 时',
+      formula: 'f(x) = λ * e^(-λx) for x ≥ 0',
     },
     gamma: {
-      name: '伽马分布',
+      name: 'Gamma Distribution',
       params: [
-        { name: 'shape', label: '形状参数 (k)', min: 0.1, max: 10, step: 0.1, defaultValue: 2 },
-        { name: 'scale', label: '尺度参数 (θ)', min: 0.1, max: 5, step: 0.1, defaultValue: 1 },
+        { name: 'shape', label: 'Shape Parameter (k)', min: 0.1, max: 10, step: 0.1, defaultValue: 2 },
+        { name: 'scale', label: 'Scale Parameter (θ)', min: 0.1, max: 5, step: 0.1, defaultValue: 1 },
       ],
-      formula: 'f(x) = (x^(k-1) * e^(-x/θ)) / (θ^k * Γ(k)) 当 x > 0 时',
+      formula: 'f(x) = (x^(k-1) * e^(-x/θ)) / (θ^k * Γ(k)) for x > 0',
     },
   };
 
-  // 初始化参数
+  // Initialize parameters
   useEffect(() => {
     const config = distributionConfigs[selectedDistribution];
     const initialParams: Record<string, number> = {};
@@ -135,9 +135,9 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
         const shape = params.shape;
         const scale = params.scale;
         for (let i = 0; i < sampleSize; i++) {
-          // 使用Marsaglia和Tsang的方法生成伽马分布随机数
+          // Generate gamma distribution random numbers using Marsaglia and Tsang's method
           if (shape < 1) {
-            // 修复：使用接受-拒绝法代替递归调用
+            // Fix: Use acceptance-rejection method instead of recursive calls
             const k = shape;
             const c = (1 / k) - 1;
             let x, u;
@@ -164,7 +164,7 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
         break;
       
       default:
-        throw new Error('不支持的分布类型');
+        throw new Error('Unsupported distribution type');
     }
     
     return data;
@@ -174,12 +174,12 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
     try {
       setErrorMessage('');
       
-      // 验证参数
+      // Validate parameters
       if (selectedDistribution === 'uniform' && params.a >= params.b) {
-        throw new Error('均匀分布的最小值必须小于最大值');
+        throw new Error('Minimum value must be less than maximum value for uniform distribution');
       }
       
-      // 使用setTimeout模拟异步操作，但不使用async/await
+      // Use setTimeout to simulate asynchronous operation without async/await
       setTimeout(() => {
         try {
           const data = generateMockData();
@@ -193,13 +193,13 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
           });
         } catch (error) {
           setErrorMessage(
-            error instanceof Error ? error.message : '生成数据时发生错误'
+            error instanceof Error ? error.message : 'Error generating data'
           );
         }
       }, 300);
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : '生成数据时发生错误'
+        error instanceof Error ? error.message : 'Error generating data'
       );
     }
   };
@@ -212,7 +212,7 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
         <GridItem>
           <VStack align="stretch" spacing={4}>
             <Box>
-              <Text mb={2} fontWeight="bold">选择分布类型</Text>
+              <Text mb={2} fontWeight="bold">Select Distribution Type</Text>
               <Select
                 value={selectedDistribution}
                 onChange={(e) => setSelectedDistribution(e.target.value)}
@@ -224,7 +224,7 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
             </Box>
             
             <Box>
-              <Text mb={2} fontWeight="bold">样本大小: {sampleSize}</Text>
+              <Text mb={2} fontWeight="bold">Sample Size: {sampleSize}</Text>
               <Slider
                 min={10}
                 max={10000}
@@ -263,7 +263,7 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
               variant="solid"
               size="lg"
             >
-              生成数据
+              Generate Data
             </Button>
             
             {errorMessage && (
@@ -289,28 +289,28 @@ function DistributionGenerator({ onDataChange }: DistributionGeneratorProps) {
               </Box>
             )}
             
-            <Text fontWeight="bold" mb={2}>参数说明:</Text>
+            <Text fontWeight="bold" mb={2}>Parameter Description:</Text>
             {currentConfig.params.map((param) => (
               <Text key={param.name} fontSize="sm" mb={1}>
-                <strong>{param.label}:</strong> {param.name === 'mean' ? '分布的中心位置' : 
-                 param.name === 'std' ? '分布的离散程度' : 
-                 param.name === 'a' ? '区间的最小值' : 
-                 param.name === 'b' ? '区间的最大值' : 
-                 param.name === 'n' ? '独立试验的次数' : 
-                 param.name === 'p' ? '每次试验成功的概率' : 
-                 param.name === 'lambda' ? '单位时间内事件发生的平均次数' : 
-                 param.name === 'shape' ? '形状参数，影响分布的形状' : 
-                 param.name === 'scale' ? '尺度参数，影响分布的范围' : ''}
+                <strong>{param.label}:</strong> {param.name === 'mean' ? 'Central location of the distribution' : 
+                 param.name === 'std' ? 'Degree of dispersion of the distribution' : 
+                 param.name === 'a' ? 'Minimum value of the interval' : 
+                 param.name === 'b' ? 'Maximum value of the interval' : 
+                 param.name === 'n' ? 'Number of independent trials' : 
+                 param.name === 'p' ? 'Probability of success in each trial' : 
+                 param.name === 'lambda' ? 'Average number of events per unit time' : 
+                 param.name === 'shape' ? 'Shape parameter that affects the distribution shape' : 
+                 param.name === 'scale' ? 'Scale parameter that affects the distribution range' : ''}
               </Text>
             ))}
             
             <Box mt={6}>
-              <Text fontWeight="bold" mb={2}>使用说明:</Text>
+              <Text fontWeight="bold" mb={2}>Instructions:</Text>
               <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>选择分布类型</li>
-                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>调整样本大小</li>
-                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>设置分布参数</li>
-                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>点击"生成数据"按钮</li>
+                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>Select distribution type</li>
+                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>Adjust sample size</li>
+                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>Set distribution parameters</li>
+                <li style={{ fontSize: 'sm', marginBottom: '4px' }}>Click the "Generate Data" button</li>
               </ul>
             </Box>
           </Box>

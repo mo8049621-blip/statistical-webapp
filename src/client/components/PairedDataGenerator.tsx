@@ -23,7 +23,7 @@ function PairedDataGenerator({ onDataGenerated }: PairedDataGeneratorProps) {
 
       if (isNaN(n) || isNaN(muBefore) || isNaN(muDiff) || isNaN(sigma) || isNaN(corr) ||
           n < 1 || n > 10000 || sigma <= 0 || corr < -1 || corr > 1) {
-        throw new Error('请输入有效的参数值');
+        throw new Error('Please enter valid parameter values');
       }
 
       const { before, after } = generatePairedNormalData(n, muBefore, muDiff, sigma, corr);
@@ -41,15 +41,15 @@ function PairedDataGenerator({ onDataGenerated }: PairedDataGeneratorProps) {
       });
 
     } catch (error) {
-      alert(error instanceof Error ? error.message : '数据生成过程中发生错误');
-    }
+        alert(error instanceof Error ? error.message : 'Error during data generation');
+      }
   };
 
   return (
     <Box>
       <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6} mb={6}>
         <FormControl>
-          <FormLabel fontSize="sm">样本大小 (n)</FormLabel>
+          <FormLabel fontSize="sm">Sample Size (n)</FormLabel>
           <Input
             type="number"
             value={sampleSize}
@@ -60,7 +60,7 @@ function PairedDataGenerator({ onDataGenerated }: PairedDataGeneratorProps) {
         </FormControl>
         
         <FormControl>
-          <FormLabel fontSize="sm">前测均值 (μ₁)</FormLabel>
+          <FormLabel fontSize="sm">Pre-test Mean (μ₁)</FormLabel>
           <Input
             type="number"
             value={meanBefore}
@@ -70,7 +70,7 @@ function PairedDataGenerator({ onDataGenerated }: PairedDataGeneratorProps) {
         </FormControl>
         
         <FormControl>
-          <FormLabel fontSize="sm">均值差 (μ₂ - μ₁)</FormLabel>
+          <FormLabel fontSize="sm">Mean Difference (μ₂ - μ₁)</FormLabel>
           <Input
             type="number"
             value={meanDifference}
@@ -80,7 +80,7 @@ function PairedDataGenerator({ onDataGenerated }: PairedDataGeneratorProps) {
         </FormControl>
         
         <FormControl>
-          <FormLabel fontSize="sm">标准差 (σ)</FormLabel>
+          <FormLabel fontSize="sm">Standard Deviation (σ)</FormLabel>
           <Input
             type="number"
             value={stdDev}
@@ -91,7 +91,7 @@ function PairedDataGenerator({ onDataGenerated }: PairedDataGeneratorProps) {
         </FormControl>
         
         <FormControl>
-          <FormLabel fontSize="sm">相关系数 (r)</FormLabel>
+          <FormLabel fontSize="sm">Correlation Coefficient (r)</FormLabel>
           <Input
             type="number"
             value={correlation}
@@ -101,13 +101,13 @@ function PairedDataGenerator({ onDataGenerated }: PairedDataGeneratorProps) {
             max="1"
           />
           <Text fontSize="xs" color="gray.500" mt={1}>
-            建议使用较高的正相关系数 (0.6-0.9) 来模拟真实的配对数据
-          </Text>
+        It is recommended to use a high positive correlation coefficient (0.6-0.9) to simulate realistic paired data
+      </Text>
         </FormControl>
       </Grid>
       
       <Button onClick={handleGenerate} colorScheme="green" width="100%">
-        生成配对数据
+        Generate Paired Data
       </Button>
     </Box>
   );

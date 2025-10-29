@@ -1,4 +1,4 @@
-// 为避免环境变量影响，暂时不加载dotenv
+// Temporarily not loading dotenv to avoid environment variable interference
 // require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -8,18 +8,18 @@ const { create, all } = require('mathjs');
 const math = create(all);
 
 const app = express();
-// 直接硬编码端口，不使用环境变量
+// Hardcoding port directly without using environment variables
 const port = 3005;
 
 // Middleware
 app.use(express.json());
 
 // Serve static files from both public and dist/client directories
-// 优先使用构建后的文件(dist/client)，开发环境下会使用public
+// Prioritize using built files (dist/client), fallback to public in development
 const publicPath = path.join(__dirname, '..', 'public');
 const distPath = path.join(__dirname, '..', '..', 'dist', 'client');
 
-// 检查dist/client目录是否存在
+// Check if dist/client directory exists
 const fs = require('fs');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
@@ -27,9 +27,9 @@ if (fs.existsSync(distPath)) {
   app.use(express.static(publicPath));
 }
 
-// 确保API路由在静态文件服务之后定义，但在catch-all路由之前
+// Ensure API routes are defined after static file serving but before catch-all route
 
-// Home page route - 优先返回dist/client/index.html
+// Home page route - prefer returning dist/client/index.html
 app.get('/', (req, res) => {
   const distIndexPath = path.join(distPath, 'index.html');
   const publicIndexPath = path.join(publicPath, 'index.html');
@@ -41,9 +41,9 @@ app.get('/', (req, res) => {
   }
 });
 
-// 所有其他非API路由都返回index.html，以支持React的客户端路由
+// All other non-API routes return index.html to support React client-side routing
 app.get('*', (req, res, next) => {
-  // 跳过API路由
+  // Skip API routes
   if (req.path.startsWith('/api')) {
     return next();
   }
@@ -591,8 +591,8 @@ function gamma(z) {
   return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
 }
 
-// 启动服务器，使用指定端口
-// 显式使用3003端口，避免任何可能的环境变量覆盖或缓存问题
+// Start the server using the specified port
+// Explicitly using port 3003 to avoid any potential environment variable overrides or caching issues
 const server = app.listen(3003, () => {
   console.log(`
 === Probability Distribution Webapp ===`);

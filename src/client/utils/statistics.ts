@@ -1,14 +1,14 @@
-// 统计计算工具函数
-// 导入math库已移除，因为当前实现不再需要
+// Statistical calculation utility functions
+// math library import removed as it's no longer needed for current implementation
 
 /**
- * 计算MLE估计
+ * Calculate MLE estimates
  */
 export const calculateMLE = (data: number[], distType: string, basicStats?: any): Record<string, number> => {
   const results: Record<string, number> = {};
   const n = data.length;
   
-  // 优先使用传入的统计量，如果没有则计算
+  // Prefer using passed statistics, calculate if not provided
   let mean = basicStats?.mean;
   let variance = basicStats?.variance || (basicStats?.std ? basicStats.std * basicStats.std : undefined);
   
@@ -45,45 +45,45 @@ export const calculateMLE = (data: number[], distType: string, basicStats?: any)
       break;
     }
     case 'gamma': {
-      // 伽马分布的MoM估计作为MLE的替代方案
+      // MoM estimation for gamma distribution as alternative to MLE
       if (!mean || !variance) {
         mean = data.reduce((sum, val) => sum + val, 0) / n;
         variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
       }
       
-      // 使用MoM估计作为简化版的MLE
+      // Use MoM estimation as simplified MLE
       results.shape = Math.max(0.001, Math.pow(mean, 2) / variance);
       results.scale = variance / mean;
       break;
     }
     case 'beta': {
-      // 贝塔分布的MoM估计作为MLE的替代方案
+      // MoM estimation for beta distribution as alternative to MLE
       if (!mean || !variance) {
         mean = data.reduce((sum, val) => sum + val, 0) / n;
         variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
       }
       
-      // 使用MoM估计作为简化版的MLE
+      // Use MoM estimation as simplified MLE
       const s = (mean * (1 - mean) / variance) - 1;
       results.alpha = mean * s;
       results.beta = (1 - mean) * s;
       break;
     }
     default:
-      throw new Error(`不支持的分布类型: ${distType}`);
+      throw new Error(`Unsupported distribution type: ${distType}`);
   }
   
   return results;
 };
 
 /**
- * 计算MoM估计
+ * Calculate MoM estimates
  */
 export const calculateMoM = (data: number[], distType: string, basicStats?: any): Record<string, number> => {
   const results: Record<string, number> = {};
   const n = data.length;
   
-  // 优先使用传入的统计量，如果没有则计算
+  // Prefer using passed statistics, calculate if not provided
   let mean = basicStats?.mean;
   let variance = basicStats?.variance || (basicStats?.std ? basicStats.std * basicStats.std : undefined);
   
@@ -128,7 +128,7 @@ export const calculateMoM = (data: number[], distType: string, basicStats?: any)
         variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
       }
       
-      // MoM估计：shape = mean^2 / variance, scale = variance / mean
+      // MoM estimates: shape = mean^2 / variance, scale = variance / mean
       results.shape = Math.max(0.001, Math.pow(mean, 2) / variance);
       results.scale = variance / mean;
       break;
@@ -139,33 +139,33 @@ export const calculateMoM = (data: number[], distType: string, basicStats?: any)
         variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
       }
       
-      // MoM估计
+      // MoM estimation
       const s = (mean * (1 - mean) / variance) - 1;
       results.alpha = mean * s;
       results.beta = (1 - mean) * s;
       break;
     }
     default:
-      throw new Error(`不支持的分布类型: ${distType}`);
+      throw new Error(`Unsupported distribution type: ${distType}`);
   }
   
   return results;
 };
 
 /**
- * 计算偏度
+ * Calculate skewness
  */
 export const calculateSkewness = (data: number[], basicStats?: { count: number; mean: number } | null): number => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   
-  // 计算样本统计量，优先使用传入的统计量
+  // Calculate sample statistics, prefer using passed statistics
   const n = basicStats?.count || data.length;
   const mean = basicStats?.mean || calculateMean(data);
   const std = calculateStd(data);
   
-  // 确保标准差不为零
+  // Ensure standard deviation is not zero
   if (std === 0) {
     return 0;
   }
@@ -175,44 +175,44 @@ export const calculateSkewness = (data: number[], basicStats?: { count: number; 
 };
 
 /**
- * 计算峰度
+ * Calculate kurtosis
  */
 export const calculateKurtosis = (data: number[], basicStats?: { count: number; mean: number; std: number } | null): number => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   
-  // 计算样本统计量，优先使用传入的统计量
+  // Calculate sample statistics, prefer using passed statistics
   const n = basicStats?.count || data.length;
   const mean = basicStats?.mean || calculateMean(data);
   const std = basicStats?.std || calculateStd(data);
   
-  // 确保标准差不为零
+  // Ensure standard deviation is not zero
   if (std === 0) {
     return 0;
   }
   
   const fourthMoment = data.reduce((sum, val) => sum + Math.pow(val - mean, 4), 0) / n;
-  return (fourthMoment / Math.pow(std, 4)) - 3; // 减去3得到超额峰度
+  return (fourthMoment / Math.pow(std, 4)) - 3; // Subtract 3 to get excess kurtosis
 };
 
 /**
- * 计算数组的均值
+ * Calculate mean of array
  */
 export const calculateMean = (data: number[]): number => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   const sum = data.reduce((acc, val) => acc + val, 0);
   return sum / data.length;
 };
 
 /**
- * 计算数组的中位数
+ * Calculate median of array
  */
 export const calculateMedian = (data: number[]): number => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   const sortedData = [...data].sort((a, b) => a - b);
   const n = sortedData.length;
@@ -225,23 +225,23 @@ export const calculateMedian = (data: number[]): number => {
 };
 
 /**
- * 计算数组的众数
+ * Calculate mode of array
  */
 export const calculateMode = (data: number[]): number[] => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   
   const frequencyMap: Record<number, number> = {};
   let maxFreq = 0;
   
-  // 计算频率并找出最大频率
+  // Calculate frequency and find maximum frequency
   data.forEach((num) => {
     frequencyMap[num] = (frequencyMap[num] || 0) + 1;
     maxFreq = Math.max(maxFreq, frequencyMap[num]);
   });
   
-  // 收集所有具有最大频率的数字
+  // Collect all numbers with maximum frequency
   const modes: number[] = [];
   Object.entries(frequencyMap).forEach(([num, freq]) => {
     if (freq === maxFreq) {
@@ -253,11 +253,11 @@ export const calculateMode = (data: number[]): number[] => {
 };
 
 /**
- * 计算数组的方差
+ * Calculate variance of array
  */
 export const calculateVariance = (data: number[]): number => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   const mean = calculateMean(data);
   const sumSquaredDiffs = data.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0);
@@ -265,18 +265,18 @@ export const calculateVariance = (data: number[]): number => {
 };
 
 /**
- * 计算数组的标准差
+ * Calculate standard deviation of array
  */
 export const calculateStd = (data: number[]): number => {
   return Math.sqrt(calculateVariance(data));
 };
 
 /**
- * 计算数组的四分位数
+ * Calculate quartiles of array
  */
 export const calculateQuartiles = (data: number[]): { q1: number; q3: number; iqr: number } => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   const sortedData = [...data].sort((a, b) => a - b);
   const n = sortedData.length;
@@ -289,20 +289,20 @@ export const calculateQuartiles = (data: number[]): { q1: number; q3: number; iq
 };
 
 /**
- * 计算均值的置信区间
- * 支持四种情况：
- * 1. 正态分布，方差已知
- * 2. 非正态分布，方差已知（大样本）
- * 3. 正态分布，方差未知（使用t分布）
- * 4. 非正态分布，方差未知（大样本）
+ * Calculate confidence interval for mean
+ * Supports four cases:
+ * 1. Normal distribution, known variance
+ * 2. Non-normal distribution, known variance (large sample)
+ * 3. Normal distribution, unknown variance (using t-distribution)
+ * 4. Non-normal distribution, unknown variance (large sample)
  * 
- * @param data 数据数组
- * @param confidenceLevel 置信水平，默认为0.95（95%）
- * @param options 可选参数
- * @param options.isNormal 是否假设正态分布，默认为false
- * @param options.knownVariance 是否已知方差，默认为false
- * @param options.populationVariance 总体方差（如果已知）
- * @returns 包含置信区间下限、上限、边际误差和使用的方法的对象
+ * @param data Data array
+ * @param confidenceLevel Confidence level, default is 0.95 (95%)
+ * @param options Optional parameters
+ * @param options.isNormal Whether to assume normal distribution, default is false
+ * @param options.knownVariance Whether variance is known, default is false
+ * @param options.populationVariance Population variance (if known)
+ * @returns Object containing confidence interval lower bound, upper bound, margin of error, and method used
  */
 export const calculateConfidenceInterval = (data: number[], confidenceLevel: number = 0.95, options: {
   isNormal?: boolean;
@@ -316,34 +316,34 @@ export const calculateConfidenceInterval = (data: number[], confidenceLevel: num
   criticalValue: number;
 } => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   
   const { isNormal = false, knownVariance = false, populationVariance } = options;
   const n = data.length;
   const mean = calculateMean(data);
   
-  // 计算标准误
+  // Calculate standard error
   let standardError: number;
   let std: number;
   
   if (knownVariance && populationVariance !== undefined) {
-    // 方差已知情况
+    // Known variance case
     standardError = Math.sqrt(populationVariance) / Math.sqrt(n);
     std = Math.sqrt(populationVariance);
   } else {
-    // 方差未知情况，使用样本标准差
+    // Unknown variance case, use sample standard deviation
     std = calculateStd(data);
     standardError = std / Math.sqrt(n);
   }
   
-  // 确定使用z分布还是t分布
+  // Determine whether to use z-distribution or t-distribution
   let criticalValue: number;
   let method: string;
   
   if (knownVariance) {
-    // 方差已知，使用z分布
-    // 根据置信水平计算z临界值
+    // Known variance, use z-distribution
+// Calculate z critical value based on confidence level
     switch (confidenceLevel) {
       case 0.90:
         criticalValue = 1.645;
@@ -355,24 +355,25 @@ export const calculateConfidenceInterval = (data: number[], confidenceLevel: num
         criticalValue = 2.576;
         break;
       default:
-        // 对于其他置信水平，使用近似值
+        // For other confidence levels, use approximation
         const alpha = 1 - confidenceLevel;
-        // 使用误差函数的逆函数近似计算z值
-        // 这里使用泰勒展开近似
+        // Use inverse error function to approximate z-value
+// Using Taylor expansion approximation
         const zApprox = Math.sqrt(2) * inverseErrorFunction(2 * (1 - alpha/2) - 1);
         criticalValue = Math.abs(zApprox);
     }
-    method = knownVariance ? 'Z分布（方差已知）' : 'Z分布（方差未知，大样本）';
+    method = knownVariance ? 'Z-distribution (known variance)' : 'Z-distribution (unknown variance, large sample)';
+
   } else {
-    // 方差未知
+    // Unknown variance
     if (isNormal || n <= 30) {
-      // 正态分布或小样本，使用t分布
-      // 这里使用近似的t临界值表
+      // Normal distribution or small sample, use t-distribution
+// Using approximate t-critical value table
       const df = n - 1;
       criticalValue = getApproximateTCriticalValue(df, confidenceLevel);
-      method = 't分布（正态分布，方差未知）';
+      method = 't distribution (normal, unknown variance)';
     } else {
-      // 非正态大样本，使用z分布近似
+      // Non-normal large sample, use z-distribution approximation
       switch (confidenceLevel) {
         case 0.90:
           criticalValue = 1.645;
@@ -388,14 +389,15 @@ export const calculateConfidenceInterval = (data: number[], confidenceLevel: num
           const zApprox = Math.sqrt(2) * inverseErrorFunction(2 * (1 - alpha/2) - 1);
           criticalValue = Math.abs(zApprox);
       }
-      method = 'Z分布（非正态，大样本，方差未知）';
+      method = 'Z-distribution (non-normal, large sample, unknown variance)';
+
     }
   }
   
-  // 计算边际误差
+  // Calculate margin of error
   const marginOfError = criticalValue * standardError;
   
-  // 计算置信区间
+  // Calculate confidence interval
   const lower = mean - marginOfError;
   const upper = mean + marginOfError;
   
@@ -403,13 +405,13 @@ export const calculateConfidenceInterval = (data: number[], confidenceLevel: num
 };
 
 /**
- * 近似计算t分布临界值
- * @param df t分布的自由度
- * @param confidenceLevel 置信水平
- * @returns t临界值
+ * Approximate calculation of t-distribution critical value
+ * @param df Degrees of freedom for t-distribution
+ * @param confidenceLevel Confidence level
+ * @returns t critical value
  */
 const getApproximateTCriticalValue = (df: number, confidenceLevel: number): number => {
-  // 常见自由度和置信水平的t临界值表（近似值）
+  // Common t-critical values table for degrees of freedom and confidence levels (approximate)
   const tTable: Record<number, Record<number, number>> = {
     1: { 0.90: 6.314, 0.95: 12.706, 0.99: 63.657 },
     2: { 0.90: 2.920, 0.95: 4.303, 0.99: 9.925 },
@@ -445,43 +447,43 @@ const getApproximateTCriticalValue = (df: number, confidenceLevel: number): numb
       10000: { 0.90: 1.645, 0.95: 1.960, 0.99: 2.576 }
   };
   
-  // 查找最接近的自由度
+  // Find closest degrees of freedom
   let closestDf = df;
   while (!(closestDf in tTable) && closestDf > 1) {
     closestDf--;
   }
   
-  // 如果找不到精确的自由度，使用最大的可用自由度
+  // If exact degrees of freedom not found, use largest available
   if (!(closestDf in tTable)) {
     closestDf = Math.max(...Object.keys(tTable).map(Number));
   }
   
-  // 返回对应的t临界值，如果置信水平不存在则使用0.95
+  // Return corresponding t-critical value, use 0.95 if confidence level doesn't exist
   const dfEntry = tTable[closestDf];
-  return dfEntry[confidenceLevel] || dfEntry[0.95] || 1.96; // 默认95%置信水平
+  return dfEntry[confidenceLevel] || dfEntry[0.95] || 1.96; // Default 95% confidence level
 };
 
-// 计算t分布临界值（通用函数）
+// Calculate t-distribution critical value (general function)
 export function getTCriticalValue(confidenceLevel: number, degreesOfFreedom: number): number {
   return getApproximateTCriticalValue(degreesOfFreedom, confidenceLevel);
 }
 
-// 计算z分布临界值（通用函数）
+// Calculate z-distribution critical value (general function)
 export function getZCriticalValue(confidenceLevel: number): number {
-  // 常用置信水平的z临界值（双侧检验）
+  // Common z-critical values for confidence levels (two-tailed test)
   const zTable: Record<number, number> = {
     0.90: 1.645,
     0.95: 1.96,
     0.99: 2.576
   };
   
-  return zTable[confidenceLevel] || 1.96; // 默认95%
+  return zTable[confidenceLevel] || 1.96; // Default 95%
 }
 
-// 计算样本标准差（使用样本方差，n-1自由度）
+// Calculate sample standard deviation (using sample variance, n-1 degrees of freedom)
 export function calculateStdDev(data: number[]): number {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   const mean = calculateMean(data);
   const sumSquaredDiffs = data.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0);
@@ -489,7 +491,7 @@ export function calculateStdDev(data: number[]): number {
   return Math.sqrt(sampleVariance);
 }
 
-// 计算两样本合并方差（假设方差相等）
+// Calculate pooled variance for two samples (assuming equal variances)
 export function calculatePooledVariance(data1: number[], data2: number[]): number {
   const n1 = data1.length;
   const n2 = data2.length;
@@ -499,15 +501,15 @@ export function calculatePooledVariance(data1: number[], data2: number[]): numbe
   return ((n1 - 1) * var1 + (n2 - 1) * var2) / (n1 + n2 - 2);
 }
 
-// 计算配对数据的差值
+// Calculate differences for paired data
 export function calculateDifferences(before: number[], after: number[]): number[] {
   if (before.length !== after.length) {
-    throw new Error('前后样本长度必须相同');
+    throw new Error('Pre and post sample lengths must be the same');
   }
   return before.map((val, index) => after[index] - val);
 }
 
-// 单样本均值置信区间
+// Single sample mean confidence interval
 export function calculateOneSampleMeanCI(
   data: number[], 
   confidenceLevel: number,
@@ -527,19 +529,19 @@ export function calculateOneSampleMeanCI(
   let method: string;
   
   if (knownVariance !== undefined) {
-    // 使用z检验（已知方差）
+    // Use z-test (known variance)
     standardError = Math.sqrt(knownVariance) / Math.sqrt(n);
     const zCritical = getZCriticalValue(confidenceLevel);
     marginOfError = zCritical * standardError;
-    method = 'z检验（已知方差）';
+    method = 'z-test (known variance)';
   } else {
-    // 使用t检验（未知方差）
+    // Use t-test (unknown variance)
     const stdDev = calculateStdDev(data);
     standardError = stdDev / Math.sqrt(n);
     const degreesOfFreedom = n - 1;
     const tCritical = getTCriticalValue(confidenceLevel, degreesOfFreedom);
     marginOfError = tCritical * standardError;
-    method = 't检验（未知方差）';
+    method = 't-test (unknown variance)';
   }
   
   return {
@@ -552,7 +554,7 @@ export function calculateOneSampleMeanCI(
   };
 }
 
-// 两样本均值之差置信区间
+// Two-sample mean difference confidence interval
 export function calculateTwoSampleMeanCI(
   data1: number[],
   data2: number[],
@@ -577,17 +579,17 @@ export function calculateTwoSampleMeanCI(
   let degreesOfFreedom: number;
   
   if (assumeEqualVariances) {
-    // 假设方差相等
+    // Assuming equal variances
     const pooledVariance = calculatePooledVariance(data1, data2);
     standardError = Math.sqrt(pooledVariance * (1/n1 + 1/n2));
     degreesOfFreedom = n1 + n2 - 2;
   } else {
-    // 不假设方差相等（Welch-Satterthwaite）
+    // Not assuming equal variances (Welch-Satterthwaite)
     const var1 = data1.reduce((sum, val) => sum + Math.pow(val - mean1, 2), 0) / (n1 - 1);
     const var2 = data2.reduce((sum, val) => sum + Math.pow(val - mean2, 2), 0) / (n2 - 1);
     standardError = Math.sqrt(var1/n1 + var2/n2);
     
-    // 计算Welch-Satterthwaite自由度
+    // Calculate Welch-Satterthwaite degrees of freedom
     const dfNumerator = Math.pow(var1/n1 + var2/n2, 2);
     const dfDenominator = Math.pow(var1, 2)/(Math.pow(n1, 2)*(n1-1)) + Math.pow(var2, 2)/(Math.pow(n2, 2)*(n2-1));
     degreesOfFreedom = dfNumerator / dfDenominator;
@@ -602,12 +604,12 @@ export function calculateTwoSampleMeanCI(
     marginOfError,
     lowerBound: meanDifference - marginOfError,
     upperBound: meanDifference + marginOfError,
-    method: assumeEqualVariances ? '合并方差t检验' : 'Welch-Satterthwaite t检验',
+    method: assumeEqualVariances ? 'Pooled variance t-test' : 'Welch-Satterthwaite t-test',
     degreesOfFreedom
   };
 }
 
-// 配对样本均值之差置信区间
+// Paired sample mean difference confidence interval
 export function calculatePairedMeanCI(
   before: number[],
   after: number[],
@@ -636,22 +638,22 @@ export function calculatePairedMeanCI(
     marginOfError,
     lowerBound: meanDifference - marginOfError,
     upperBound: meanDifference + marginOfError,
-    method: '配对t检验'
+    method: 'Paired t-test'
   };
 }
 
-// 单比例置信区间函数在下方已定义，此处为了兼容旧代码保留引用
+// Single proportion confidence interval function is defined below, keeping reference here for backward compatibility
 
-// 两比例之差置信区间函数在下方已定义，此处为了兼容旧代码保留引用
+// Two-proportion difference confidence interval function is defined below, keeping reference here for backward compatibility
 
 /**
- * 误差函数的逆函数近似
- * @param x 输入值，范围[-1,1]
- * @returns 逆误差函数值
+ * Inverse error function approximation
+ * @param x Input value, range [-1,1]
+ * @returns Inverse error function value
  */
 const inverseErrorFunction = (x: number): number => {
-  // 误差函数逆函数的近似计算
-  // 这里使用泰勒展开的近似方法
+  // Approximate calculation of inverse error function
+// Using Taylor expansion approximation
   const a = 0.140012;
   const sign = x >= 0 ? 1 : -1;
   const absX = Math.abs(x);
@@ -667,7 +669,7 @@ const inverseErrorFunction = (x: number): number => {
 };
 
 /**
- * 计算描述性统计量
+ * Calculate descriptive statistics
  */
 export const calculateDescriptiveStats = (data: number[], confidenceLevel: number = 0.95, options?: {
   isNormal?: boolean;
@@ -696,7 +698,7 @@ export const calculateDescriptiveStats = (data: number[], confidenceLevel: numbe
   };
 } => {
   if (!data || data.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   
   const sortedData = [...data].sort((a, b) => a - b);
@@ -720,16 +722,16 @@ export const calculateDescriptiveStats = (data: number[], confidenceLevel: numbe
 };
 
 /**
- * 计算单个比例的置信区间
- * 支持两种方法：
- * 1. Wald区间（正态近似法）
- * 2. Wilson得分区间（更准确的小样本方法）
+ * Calculate confidence interval for a single proportion
+ * Supports two methods:
+ * 1. Wald interval (normal approximation)
+ * 2. Wilson score interval (more accurate for small samples)
  * 
- * @param successes 成功次数
- * @param trials 试验总次数
- * @param confidenceLevel 置信水平，默认为0.95（95%）
- * @param options 可选参数
- * @param options.method 方法：'wald'（正态近似）或 'wilson'（Wilson得分区间）
+ * @param successes Number of successes
+ * @param trials Total number of trials
+ * @param confidenceLevel Confidence level, default is 0.95 (95%)
+ * @param options Optional parameters
+ * @param options.method Method: 'wald' (normal approximation) or 'wilson' (Wilson score interval)
  * @returns 包含置信区间下限、上限、边际误差和使用的方法的对象
  */
 export const calculateProportionConfidenceInterval = (successes: number, trials: number, confidenceLevel: number = 0.95, options: {
@@ -743,19 +745,19 @@ export const calculateProportionConfidenceInterval = (successes: number, trials:
   proportion: number;
 } => {
   if (trials <= 0) {
-    throw new Error('试验总次数必须大于0');
+    throw new Error('Total number of trials must be greater than 0');
   }
   if (successes < 0 || successes > trials) {
-    throw new Error('成功次数必须在0到试验总次数之间');
+    throw new Error('Number of successes must be between 0 and total number of trials');
   }
   if (confidenceLevel <= 0 || confidenceLevel >= 1) {
-    throw new Error('置信水平必须在0到1之间');
+    throw new Error('Confidence level must be between 0 and 1');
   }
   
   const { method = 'wald' } = options;
   const proportion = successes / trials;
   
-  // 计算临界值（z值）
+  // Calculate critical value (z-value)
   let criticalValue: number;
   switch (confidenceLevel) {
     case 0.90:
@@ -768,7 +770,7 @@ export const calculateProportionConfidenceInterval = (successes: number, trials:
       criticalValue = 2.576;
       break;
     default:
-      // 对于其他置信水平，使用误差函数的逆函数近似计算z值
+      // For other confidence levels, use inverse error function to approximate z-value
       const alpha = 1 - confidenceLevel;
       const zApprox = Math.sqrt(2) * inverseErrorFunction(2 * (1 - alpha/2) - 1);
       criticalValue = Math.abs(zApprox);
@@ -779,7 +781,7 @@ export const calculateProportionConfidenceInterval = (successes: number, trials:
   let methodName: string;
   
   if (method === 'wilson') {
-    // Wilson得分区间
+    // Wilson score interval
     const n = trials;
     const z = criticalValue;
     const zSquared = z * z;
@@ -790,18 +792,18 @@ export const calculateProportionConfidenceInterval = (successes: number, trials:
     
     lower = pTilde - numerator / denominator;
     upper = pTilde + numerator / denominator;
-    methodName = 'Wilson得分区间';
+    methodName = 'Wilson score interval';
   } else {
-    // Wald区间（正态近似）
+    // Wald interval (normal approximation)
     const standardError = Math.sqrt((proportion * (1 - proportion)) / trials);
     const marginOfError = criticalValue * standardError;
     
     lower = proportion - marginOfError;
     upper = proportion + marginOfError;
-    methodName = 'Wald区间（正态近似）';
+    methodName = 'Wald interval (normal approximation)';
   }
   
-  // 确保结果在[0, 1]范围内
+  // Ensure result is within [0, 1] range
   lower = Math.max(0, lower);
   upper = Math.min(1, upper);
   const marginOfError = (upper - lower) / 2;
@@ -817,18 +819,18 @@ export const calculateProportionConfidenceInterval = (successes: number, trials:
 };
 
 /**
- * 计算两个比例之差的置信区间
- * 支持两种方法：
- * 1. 正态近似法（Wald区间）
- * 2. 连续性修正法
+ * Calculate confidence interval for the difference between two proportions
+ * Supports two methods:
+ * 1. Normal approximation (Wald interval)
+ * 2. Continuity correction method
  * 
- * @param successes1 第一个样本的成功次数
- * @param trials1 第一个样本的试验总次数
- * @param successes2 第二个样本的成功次数
- * @param trials2 第二个样本的试验总次数
- * @param confidenceLevel 置信水平，默认为0.95（95%）
- * @param options 可选参数
- * @param options.method 方法：'wald'（正态近似）或 'continuity'（连续性修正）
+ * @param successes1 Number of successes in first sample
+ * @param trials1 Total number of trials in first sample
+ * @param successes2 Number of successes in second sample
+ * @param trials2 Total number of trials in second sample
+ * @param confidenceLevel Confidence level, default is 0.95 (95%)
+ * @param options Optional parameters
+ * @param options.method Method: 'wald' (normal approximation) or 'continuity' (continuity correction)
  * @returns 包含置信区间下限、上限、边际误差和使用的方法的对象
  */
 export const calculateTwoProportionConfidenceInterval = (successes1: number, trials1: number, successes2: number, trials2: number, confidenceLevel: number = 0.95, options: {
@@ -843,25 +845,25 @@ export const calculateTwoProportionConfidenceInterval = (successes1: number, tri
   proportion1: number;
   proportion2: number;
 } => {
-  // 参数验证
+  // Parameter validation
   if (trials1 <= 0 || trials2 <= 0) {
-    throw new Error('试验总次数必须大于0');
+    throw new Error('Total number of trials must be greater than 0');
   }
   if (successes1 < 0 || successes1 > trials1 || successes2 < 0 || successes2 > trials2) {
-    throw new Error('成功次数必须在0到试验总次数之间');
+    throw new Error('Number of successes must be between 0 and total number of trials');
   }
   if (confidenceLevel <= 0 || confidenceLevel >= 1) {
-    throw new Error('置信水平必须在0到1之间');
+    throw new Error('Confidence level must be between 0 and 1');
   }
   
   const { method = 'wald' } = options;
   
-  // 计算样本比例
+  // Calculate sample proportions
   const proportion1 = successes1 / trials1;
   const proportion2 = successes2 / trials2;
   const proportionDiff = proportion1 - proportion2;
   
-  // 计算临界值（z值）
+  // Calculate critical value (z-value)
   let criticalValue: number;
   switch (confidenceLevel) {
     case 0.90:
@@ -884,7 +886,7 @@ export const calculateTwoProportionConfidenceInterval = (successes1: number, tri
   let methodName: string;
   
   if (method === 'continuity') {
-    // 连续性修正法
+    // Continuity correction method
     const p1 = (successes1 + 0.5) / trials1;
     const p2 = (successes2 + 0.5) / trials2;
     const pDiff = p1 - p2;
@@ -894,18 +896,18 @@ export const calculateTwoProportionConfidenceInterval = (successes1: number, tri
     
     lower = pDiff - marginOfError;
     upper = pDiff + marginOfError;
-    methodName = '连续性修正法';
+    methodName = 'Continuity correction method';
   } else {
-    // Wald区间（正态近似）
+    // Wald interval (normal approximation)
     const standardError = Math.sqrt((proportion1 * (1 - proportion1)) / trials1 + (proportion2 * (1 - proportion2)) / trials2);
     const marginOfError = criticalValue * standardError;
     
     lower = proportionDiff - marginOfError;
     upper = proportionDiff + marginOfError;
-    methodName = 'Wald区间（正态近似）';
+    methodName = 'Wald interval (normal approximation)';
   }
   
-  // 确保结果在[-1, 1]范围内
+  // Ensure result is within [-1, 1] range
   lower = Math.max(-1, lower);
   upper = Math.min(1, upper);
   const marginOfError = (upper - lower) / 2;
@@ -923,18 +925,18 @@ export const calculateTwoProportionConfidenceInterval = (successes1: number, tri
 };
 
 /**
- * 计算两个均值之差的置信区间
- * 支持三种情况：
- * 1. 两独立样本，方差相等（Pooled t-interval）
- * 2. 两独立样本，方差不等（Welch's t-interval）
- * 3. 配对样本（Paired t-interval）
+ * Calculate confidence interval for the difference between two means
+ * Supports three cases:
+ * 1. Two independent samples, equal variances (Pooled t-interval)
+ * 2. Two independent samples, unequal variances (Welch's t-interval)
+ * 3. Paired samples (Paired t-interval)
  * 
- * @param data1 第一个样本数据
- * @param data2 第二个样本数据
- * @param confidenceLevel 置信水平，默认为0.95（95%）
- * @param options 可选参数
- * @param options.method 方法：'pooled'（方差相等）、'welch'（方差不等）、'paired'（配对样本）
- * @param options.isNormal 是否假设正态分布，默认为true
+ * @param data1 First sample data
+ * @param data2 Second sample data
+ * @param confidenceLevel Confidence level, default is 0.95 (95%)
+ * @param options Optional parameters
+ * @param options.method Method: 'pooled' (equal variances), 'welch' (unequal variances), 'paired' (paired samples)
+ * @param options.isNormal Whether to assume normal distribution, default is true
  * @returns 包含置信区间下限、上限、边际误差和使用的方法的对象
  */
 export const calculateTwoSampleConfidenceInterval = (data1: number[], data2: number[], confidenceLevel: number = 0.95, options: {
@@ -949,7 +951,7 @@ export const calculateTwoSampleConfidenceInterval = (data1: number[], data2: num
   meanDiff: number;
 } => {
   if (!data1 || !data2 || data1.length === 0 || data2.length === 0) {
-    throw new Error('数据数组不能为空');
+    throw new Error('Data array cannot be empty');
   }
   
   const { method = 'welch' } = options;

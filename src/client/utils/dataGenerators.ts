@@ -1,10 +1,10 @@
-// 数据生成工具函数
+// Data generation utility functions
 
-// 生成正态分布数据
+// Generate normal distribution data
 export function generateNormalData(n: number, mean: number, stdDev: number): number[] {
   const data: number[] = [];
   for (let i = 0; i < n; i++) {
-    // 使用Box-Muller变换生成正态分布随机数
+    // Generate normal distribution random numbers using Box-Muller transform
     let u = 0, v = 0;
     while(u === 0) u = Math.random();
     while(v === 0) v = Math.random();
@@ -14,7 +14,7 @@ export function generateNormalData(n: number, mean: number, stdDev: number): num
   return data;
 }
 
-// 生成均匀分布数据
+// Generate uniform distribution data
 export function generateUniformData(n: number, min: number, max: number): number[] {
   const data: number[] = [];
   for (let i = 0; i < n; i++) {
@@ -23,7 +23,7 @@ export function generateUniformData(n: number, min: number, max: number): number
   return data;
 }
 
-// 生成二项分布数据
+// Generate binomial distribution data
 export function generateBinomialData(n: number, p: number): number[] {
   const data: number[] = [];
   for (let i = 0; i < n; i++) {
@@ -32,7 +32,7 @@ export function generateBinomialData(n: number, p: number): number[] {
   return data;
 }
 
-// 生成配对正态数据
+// Generate paired normal data
 export function generatePairedNormalData(
   n: number,
   meanBefore: number,
@@ -44,7 +44,7 @@ export function generatePairedNormalData(
   const after: number[] = [];
   
   for (let i = 0; i < n; i++) {
-    // 使用Box-Muller变换生成正态分布随机数
+    // Generate normal distribution random numbers using Box-Muller transform
     let u1 = 0, v1 = 0;
     while(u1 === 0) u1 = Math.random();
     while(v1 === 0) v1 = Math.random();
@@ -55,7 +55,7 @@ export function generatePairedNormalData(
     while(v2 === 0) v2 = Math.random();
     const z2 = Math.sqrt(-2.0 * Math.log(u2)) * Math.cos(2.0 * Math.PI * v2);
     
-    // 生成相关的配对数据
+    // Generate correlated paired data
     const x = meanBefore + stdDev * z1;
     const y = (meanBefore + meanDifference) + 
                correlation * stdDev * z1 + 

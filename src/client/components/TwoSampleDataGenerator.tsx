@@ -7,7 +7,7 @@ interface TwoSampleDataGeneratorProps {
 }
 
 function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps) {
-  // 样本1参数
+  // Sample 1 Parameters
   const [sample1Size, setSample1Size] = useState<string>('50');
   const [sample1Distribution, setSample1Distribution] = useState<string>('normal');
   const [sample1Mean, setSample1Mean] = useState<string>('0');
@@ -16,7 +16,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
   const [sample1Max, setSample1Max] = useState<string>('1');
   const [sample1Probability, setSample1Probability] = useState<string>('0.5');
   
-  // 样本2参数
+  // Sample 2 Parameters
   const [sample2Size, setSample2Size] = useState<string>('50');
   const [sample2Distribution, setSample2Distribution] = useState<string>('normal');
   const [sample2Mean, setSample2Mean] = useState<string>('1');
@@ -42,7 +42,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
 
   const handleGenerate = () => {
     try {
-      // 生成样本1
+      // Generate sample 1
       const params1 = {
         mean: parseFloat(sample1Mean),
         stdDev: parseFloat(sample1StdDev),
@@ -51,7 +51,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
         probability: parseFloat(sample1Probability)
       };
       
-      // 生成样本2
+      // Generate sample 2
       const params2 = {
         mean: parseFloat(sample2Mean),
         stdDev: parseFloat(sample2StdDev),
@@ -75,7 +75,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
       onDataGenerated({ sample1, sample2, params1, params2 });
       
     } catch (error) {
-      alert(error instanceof Error ? error.message : '数据生成过程中发生错误');
+      alert(error instanceof Error ? error.message : 'An error occurred during data generation');
     }
   };
 
@@ -113,7 +113,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
         return (
           <Grid gap={4}>
             <FormControl>
-              <FormLabel fontSize="sm">均值 (μ)</FormLabel>
+              <FormLabel fontSize="sm">Mean (μ)</FormLabel>
               <Input
                 type="number"
                 value={values.mean}
@@ -122,7 +122,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontSize="sm">标准差 (σ)</FormLabel>
+              <FormLabel fontSize="sm">Standard Deviation (σ)</FormLabel>
               <Input
                 type="number"
                 value={values.stdDev}
@@ -137,7 +137,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
         return (
           <Grid gap={4}>
             <FormControl>
-              <FormLabel fontSize="sm">最小值 (a)</FormLabel>
+              <FormLabel fontSize="sm">Minimum Value (a)</FormLabel>
               <Input
                 type="number"
                 value={values.min}
@@ -146,7 +146,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontSize="sm">最大值 (b)</FormLabel>
+              <FormLabel fontSize="sm">Maximum Value (b)</FormLabel>
               <Input
                 type="number"
                 value={values.max}
@@ -159,7 +159,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
       case 'binomial':
         return (
           <FormControl>
-            <FormLabel fontSize="sm">成功概率 (p)</FormLabel>
+            <FormLabel fontSize="sm">Success Probability (p)</FormLabel>
             <Input
               type="number"
               value={values.probability}
@@ -180,10 +180,10 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
       <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6} mb={6}>
         <Card>
           <CardBody>
-            <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>样本 1</Text>
+            <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>Sample 1</Text>
             <Grid gap={4}>
               <FormControl>
-                <FormLabel fontSize="sm">样本大小</FormLabel>
+                <FormLabel fontSize="sm">Sample Size</FormLabel>
                 <Input
                   type="number"
                   value={sample1Size}
@@ -193,14 +193,14 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="sm">分布类型</FormLabel>
+                <FormLabel fontSize="sm">Distribution Type</FormLabel>
                 <Select
                   value={sample1Distribution}
                   onChange={(e) => setSample1Distribution(e.target.value)}
                 >
-                  <option value="normal">正态分布</option>
-                  <option value="uniform">均匀分布</option>
-                  <option value="binomial">二项分布</option>
+                  <option value="normal">Normal Distribution</option>
+                  <option value="uniform">Uniform Distribution</option>
+                  <option value="binomial">Binomial Distribution</option>
                 </Select>
               </FormControl>
               {renderDistributionParams(sample1Distribution, 1)}
@@ -210,28 +210,28 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
         
         <Card>
           <CardBody>
-            <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>样本 2</Text>
+            <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>Sample 2</Text>
             <Grid gap={4}>
               <FormControl>
-                <FormLabel fontSize="sm">样本大小</FormLabel>
-                <Input
-                  type="number"
-                  value={sample2Size}
-                  onChange={(e) => setSample2Size(e.target.value)}
-                  min="1"
-                  max="10000"
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize="sm">分布类型</FormLabel>
-                <Select
-                  value={sample2Distribution}
-                  onChange={(e) => setSample2Distribution(e.target.value)}
-                >
-                  <option value="normal">正态分布</option>
-                  <option value="uniform">均匀分布</option>
-                  <option value="binomial">二项分布</option>
-                </Select>
+                <FormLabel fontSize="sm">Sample Size</FormLabel>
+              <Input
+                type="number"
+                value={sample2Size}
+                onChange={(e) => setSample2Size(e.target.value)}
+                min="1"
+                max="10000"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel fontSize="sm">Distribution Type</FormLabel>
+              <Select
+                value={sample2Distribution}
+                onChange={(e) => setSample2Distribution(e.target.value)}
+              >
+                <option value="normal">Normal Distribution</option>
+                <option value="uniform">Uniform Distribution</option>
+                <option value="binomial">Binomial Distribution</option>
+              </Select>
               </FormControl>
               {renderDistributionParams(sample2Distribution, 2)}
             </Grid>
@@ -240,7 +240,7 @@ function TwoSampleDataGenerator({ onDataGenerated }: TwoSampleDataGeneratorProps
       </Grid>
       
       <Button onClick={handleGenerate} colorScheme="green" width="100%">
-        生成两组数据
+        Generate Two Samples
       </Button>
     </Box>
   );

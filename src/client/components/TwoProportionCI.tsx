@@ -22,17 +22,17 @@ function TwoProportionCI() {
       const t2 = parseInt(trials2, 10);
       const confidence = confidenceLevel;
 
-      // 参数验证
+      // Parameter validation
       if (isNaN(s1) || isNaN(t1) || isNaN(s2) || isNaN(t2)) {
-        throw new Error('请输入有效的整数');
+        throw new Error('Please enter valid integers');
       }
 
       if (t1 <= 0 || t2 <= 0) {
-        throw new Error('试验次数必须大于0');
+        throw new Error('Number of trials must be greater than 0');
       }
 
       if (s1 < 0 || s1 > t1 || s2 < 0 || s2 > t2) {
-        throw new Error('成功次数必须在0到试验次数之间');
+        throw new Error('Number of successes must be between 0 and number of trials');
       }
 
       const ciResult = calculateTwoProportionConfidenceInterval(
@@ -46,7 +46,7 @@ function TwoProportionCI() {
 
       setResult(ciResult);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '计算错误');
+      setError(err instanceof Error ? err.message : 'Calculation error');
       setResult(null);
     }
   };
@@ -55,7 +55,7 @@ function TwoProportionCI() {
     <Card>
       <CardBody>
         <Text fontSize="xl" fontWeight="bold" mb={6} textAlign="center">
-          两比例之差的置信区间
+          Two-Proportion Difference Confidence Interval
         </Text>
 
         {error && (
@@ -66,25 +66,25 @@ function TwoProportionCI() {
 
         <VStack spacing={4} align="stretch">
           <Box p={4} borderWidth={1} borderRadius="lg">
-            <Text fontWeight="medium" mb={4}>第一组样本</Text>
+            <Text fontWeight="medium" mb={4}>First Group Sample</Text>
             <HStack spacing={4}>
               <Box flex={1}>
-                <Text fontSize="sm" mb={1}>成功次数</Text>
+                <Text fontSize="sm" mb={1}>Number of Successes</Text>
                 <Input
                   value={successes1}
                   onChange={(e) => setSuccesses1(e.target.value)}
-                  placeholder="例如：45"
+                  placeholder="Example: 45"
                   type="number"
                   min="0"
                   size="lg"
                 />
               </Box>
               <Box flex={1}>
-                <Text fontSize="sm" mb={1}>总试验次数</Text>
+                <Text fontSize="sm" mb={1}>Total Number of Trials</Text>
                 <Input
                   value={trials1}
                   onChange={(e) => setTrials1(e.target.value)}
-                  placeholder="例如：100"
+                  placeholder="Example: 100"
                   type="number"
                   min="1"
                   size="lg"
@@ -94,25 +94,25 @@ function TwoProportionCI() {
           </Box>
 
           <Box p={4} borderWidth={1} borderRadius="lg">
-            <Text fontWeight="medium" mb={4}>第二组样本</Text>
+            <Text fontWeight="medium" mb={4}>Second Group Sample</Text>
             <HStack spacing={4}>
               <Box flex={1}>
-                <Text fontSize="sm" mb={1}>成功次数</Text>
+                <Text fontSize="sm" mb={1}>Number of Successes</Text>
                 <Input
                   value={successes2}
                   onChange={(e) => setSuccesses2(e.target.value)}
-                  placeholder="例如：60"
+                  placeholder="Example: 60"
                   type="number"
                   min="0"
                   size="lg"
                 />
               </Box>
               <Box flex={1}>
-                <Text fontSize="sm" mb={1}>总试验次数</Text>
+                <Text fontSize="sm" mb={1}>Total Number of Trials</Text>
                 <Input
                   value={trials2}
                   onChange={(e) => setTrials2(e.target.value)}
-                  placeholder="例如：100"
+                  placeholder="Example: 100"
                   type="number"
                   min="1"
                   size="lg"
@@ -123,7 +123,7 @@ function TwoProportionCI() {
 
           <HStack spacing={4}>
             <Box flex={1}>
-              <Text fontWeight="medium" mb={2}>置信水平</Text>
+              <Text fontWeight="medium" mb={2}>Confidence Level</Text>
               <Select
                 value={confidenceLevel.toString()}
                 onChange={(e) => setConfidenceLevel(parseFloat(e.target.value))}
@@ -136,69 +136,69 @@ function TwoProportionCI() {
               </Select>
             </Box>
             <Box flex={1}>
-              <Text fontWeight="medium" mb={2}>计算方法</Text>
+              <Text fontWeight="medium" mb={2}>Calculation Method</Text>
               <RadioGroup value={method} onChange={(v) => setMethod(v as 'wald' | 'continuity')}>
                 <Stack direction="row">
-                  <Radio value="wald">Wald区间</Radio>
-                  <Radio value="continuity">连续性修正</Radio>
+                  <Radio value="wald">Wald Interval</Radio>
+                  <Radio value="continuity">Continuity Correction</Radio>
                 </Stack>
               </RadioGroup>
             </Box>
           </HStack>
 
           <Button onClick={handleCalculate} colorScheme="blue" size="lg">
-            计算置信区间
+            Calculate Confidence Interval
           </Button>
         </VStack>
 
         {result && (
           <Box mt={6} p={4} borderWidth={1} borderRadius="lg" bg="gray.50">
-            <Text fontSize="lg" fontWeight="bold" mb={4}>计算结果</Text>
+            <Text fontSize="lg" fontWeight="bold" mb={4}>Calculation Results</Text>
             
             <Table variant="simple">
               <tbody>
                 <Tr>
-                  <Th>统计量</Th>
-                  <Th>值</Th>
+                  <Th>Statistic</Th>
+                  <Th>Value</Th>
                 </Tr>
                 <Tr>
-                  <Th>计算方法</Th>
+                  <Th>Calculation Method</Th>
                   <Td>{result.method}</Td>
                 </Tr>
                 <Tr>
-                  <Th>第一组比例</Th>
+                  <Th>First Group Proportion</Th>
                   <Td>{(result.proportion1 * 100).toFixed(2)}%</Td>
                 </Tr>
                 <Tr>
-                  <Th>第二组比例</Th>
+                  <Th>Second Group Proportion</Th>
                   <Td>{(result.proportion2 * 100).toFixed(2)}%</Td>
                 </Tr>
                 <Tr>
-                  <Th>比例差</Th>
+                  <Th>Proportion Difference</Th>
                   <Td>{(result.proportionDiff * 100).toFixed(2)}%</Td>
                 </Tr>
                 <Tr>
-                  <Th>临界值</Th>
+                  <Th>Critical Value</Th>
                   <Td>{result.criticalValue.toFixed(4)}</Td>
                 </Tr>
                 <Tr>
-                  <Th>边际误差</Th>
+                  <Th>Margin of Error</Th>
                   <Td>{(result.marginOfError * 100).toFixed(2)}%</Td>
                 </Tr>
                 <Tr>
-                  <Th>置信区间</Th>
+                  <Th>Confidence Interval</Th>
                   <Td>[{(result.lower * 100).toFixed(2)}%, {(result.upper * 100).toFixed(2)}%]</Td>
                 </Tr>
               </tbody>
             </Table>
 
             <Box mt={4} p={3} bg="blue.50" borderRadius="lg">
-              <Text fontWeight="medium">结果解释</Text>
+              <Text fontWeight="medium">Result Interpretation</Text>
               <Text mt={1} fontSize="sm">
-                我们有{confidenceLevel * 100}%的信心认为，两个总体比例之差位于[{(result.lower * 100).toFixed(2)}%, {(result.upper * 100).toFixed(2)}%]之间。
-                {result.lower > 0 && " 这表明第一个总体的比例显著高于第二个总体。"}
-                {result.upper < 0 && " 这表明第一个总体的比例显著低于第二个总体。"}
-                {result.lower <= 0 && result.upper >= 0 && " 两个总体的比例可能没有显著差异。"}
+                We are {confidenceLevel * 100}% confident that the difference between the two population proportions lies between [{(result.lower * 100).toFixed(2)}%, {(result.upper * 100).toFixed(2)}%].
+                {result.lower > 0 && " This indicates that the proportion in the first population is significantly higher than in the second population."}
+                {result.upper < 0 && " This indicates that the proportion in the first population is significantly lower than in the second population."}
+                {result.lower <= 0 && result.upper >= 0 && " The two population proportions may not be significantly different."}
               </Text>
             </Box>
           </Box>

@@ -22,20 +22,20 @@ const TwoSampleCIComponent = () => {
   const [error, setError] = useState<string | null>(null);
 
   const parseData = (input: string): number[] => {
-    // 尝试多种格式解析：逗号分隔、空格分隔、换行分隔
+    // Try multiple format parsing: comma-separated, space-separated, line-separated
     try {
-      // 首先尝试直接解析为JSON数组
+      // First try to parse directly as JSON array
       if (input.trim().startsWith('[') && input.trim().endsWith(']')) {
         return JSON.parse(input);
       }
-      // 否则按逗号、空格、换行等分隔符解析
+      // Otherwise parse by comma, space, newline, etc.
       return input
         .split(/[,\s\n]+/)
         .filter(item => item.trim() !== '')
         .map(item => parseFloat(item.trim()))
         .filter(num => !isNaN(num));
     } catch (e) {
-      throw new Error('数据格式错误，请输入有效的数字列表');
+      throw new Error('Data format error, please enter valid number list');
     }
   };
 
@@ -44,23 +44,23 @@ const TwoSampleCIComponent = () => {
     setResult(null);
 
     try {
-      // 解析输入数据
+      // Parse input data
       const dataset1 = parseData(data1);
       const dataset2 = parseData(data2);
 
       if (dataset1.length === 0 || dataset2.length === 0) {
-        throw new Error('数据集不能为空');
+        throw new Error('Dataset cannot be empty');
       }
 
-      // 如果是配对样本，检查长度是否相同
+      // If paired sample, check if lengths are the same
       if (method === 'paired' && dataset1.length !== dataset2.length) {
-        throw new Error('配对样本的数据集长度必须相同');
+        throw new Error('Paired samples must have the same length');
       }
 
-      // 计算两个均值之差的置信区间
+      // Calculate confidence interval for the difference between two means
       const ciResult = calculateTwoSampleConfidenceInterval(dataset1, dataset2, confidenceLevel, { method });
 
-      // 计算样本均值
+      // Calculate sample means
       const mean1 = dataset1.reduce((sum, val) => sum + val, 0) / dataset1.length;
       const mean2 = dataset2.reduce((sum, val) => sum + val, 0) / dataset2.length;
 
@@ -72,14 +72,14 @@ const TwoSampleCIComponent = () => {
         n2: dataset2.length
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : '计算过程中发生错误');
+      setError(e instanceof Error ? e.message : 'Error occurred during calculation');
     }
   };
 
   const handleDemoData = () => {
-    // 设置示例数据（两组正态分布的样本）
-    const demo1 = Array(20).fill(0).map(() => 5 + Math.random() * 2); // 均值约为5的样本
-    const demo2 = Array(20).fill(0).map(() => 6 + Math.random() * 2); // 均值约为6的样本
+    // Set example data (two normal distribution samples)
+    const demo1 = Array(20).fill(0).map(() => 5 + Math.random() * 2); // Sample with mean around 5
+    const demo2 = Array(20).fill(0).map(() => 6 + Math.random() * 2); // Sample with mean around 6
     
     setData1(demo1.join(', '));
     setData2(demo2.join(', '));
@@ -91,29 +91,29 @@ const TwoSampleCIComponent = () => {
 
   return (
     <Box p={6} maxW="1200px" mx="auto">
-      <Text fontSize="2xl" fontWeight="bold" mb={6}>两个均值之差的置信区间</Text>
+      <Text fontSize="2xl" fontWeight="bold" mb={6}>Confidence Interval for Two Sample Means Difference</Text>
       
       <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6} mb={8}>
-        {/* 第一个数据集输入 */}
+        {/* First dataset input */}
         <FormControl>
-          <FormLabel>数据集1</FormLabel>
-          <Text fontSize="sm" color="gray.500" mb={2}>输入逗号分隔或空格分隔的数字列表，例如：1, 2, 3, 4, 5</Text>
+          <FormLabel>Dataset 1</FormLabel>
+          <Text fontSize="sm" color="gray.500" mb={2}>Enter comma-separated or space-separated list of numbers, e.g.: 1, 2, 3, 4, 5</Text>
           <Input
             as="textarea"
-            placeholder="输入第一个数据集的数字..."
+            placeholder="Enter numbers for first dataset..."
             value={data1}
             onChange={(e) => setData1(e.target.value)}
             rows={6}
           />
         </FormControl>
 
-        {/* 第二个数据集输入 */}
+        {/* Second dataset input */}
         <FormControl>
-          <FormLabel>数据集2</FormLabel>
-          <Text fontSize="sm" color="gray.500" mb={2}>输入逗号分隔或空格分隔的数字列表，例如：6, 7, 8, 9, 10</Text>
+          <FormLabel>Dataset 2</FormLabel>
+          <Text fontSize="sm" color="gray.500" mb={2}>Enter comma-separated or space-separated list of numbers, e.g.: 6, 7, 8, 9, 10</Text>
           <Input
             as="textarea"
-            placeholder="输入第二个数据集的数字..."
+            placeholder="Enter numbers for second dataset..."
             value={data2}
             onChange={(e) => setData2(e.target.value)}
             rows={6}
@@ -122,9 +122,9 @@ const TwoSampleCIComponent = () => {
       </Grid>
 
       <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={4} mb={6}>
-        {/* 置信水平选择 */}
+        {/* Confidence level selection */}
         <FormControl>
-          <FormLabel>置信水平</FormLabel>
+          <FormLabel>Confidence Level</FormLabel>
           <Select 
             value={confidenceLevel} 
             onChange={(e) => setConfidenceLevel(parseFloat(e.target.value))}
@@ -135,16 +135,16 @@ const TwoSampleCIComponent = () => {
           </Select>
         </FormControl>
 
-        {/* 方法选择 */}
+        {/* Method selection */}
         <FormControl>
-          <FormLabel>计算方法</FormLabel>
+          <FormLabel>Calculation Method</FormLabel>
           <Select 
             value={method} 
             onChange={(e) => setMethod(e.target.value as 'pooled' | 'welch' | 'paired')}
           >
-            <option value="pooled">合并方差t检验 (Pooled t)</option>
-            <option value="welch">Welch t检验 (方差不等)</option>
-            <option value="paired">配对样本t检验</option>
+            <option value="pooled">Pooled Variance t-test</option>
+            <option value="welch">Welch t-test (Unequal Variances)</option>
+            <option value="paired">Paired Samples t-test</option>
           </Select>
         </FormControl>
 
@@ -155,7 +155,7 @@ const TwoSampleCIComponent = () => {
             width="100%"
             onClick={calculate}
           >
-            计算置信区间
+            Calculate Confidence Interval
           </Button>
         </FormControl>
 
@@ -166,104 +166,104 @@ const TwoSampleCIComponent = () => {
             width="100%"
             onClick={handleDemoData}
           >
-            使用示例数据
+            Use Example Data
           </Button>
         </FormControl>
       </Grid>
 
-      {/* 错误提示 */}
+      {/* Error message */}
       {error && (
         <Alert status="error" mb={6}>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      {/* 结果展示 */}
+      {/* Result display */}
       {result && (
         <>
-          <Text fontSize="xl" fontWeight="bold" mb={4}>计算结果</Text>
+          <Text fontSize="xl" fontWeight="bold" mb={4}>Calculation Results</Text>
           
           <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={4} mb={8}>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">数据集1均值</Text>
+                <Text fontSize="sm" color="gray.500">Dataset 1 Mean</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.mean1.toFixed(4)}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">数据集2均值</Text>
+                <Text fontSize="sm" color="gray.500">Dataset 2 Mean</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.mean2.toFixed(4)}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">均值差</Text>
+                <Text fontSize="sm" color="gray.500">Mean Difference</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.meanDiff.toFixed(4)}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">{Math.round(confidenceLevel * 100)}% 置信区间下限</Text>
+                <Text fontSize="sm" color="gray.500">{Math.round(confidenceLevel * 100)}% Confidence Interval Lower Bound</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.lower.toFixed(4)}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">{Math.round(confidenceLevel * 100)}% 置信区间上限</Text>
+                <Text fontSize="sm" color="gray.500">{Math.round(confidenceLevel * 100)}% Confidence Interval Upper Bound</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.upper.toFixed(4)}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">边际误差</Text>
+                <Text fontSize="sm" color="gray.500">Margin of Error</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.marginOfError.toFixed(4)}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">临界值</Text>
+                <Text fontSize="sm" color="gray.500">Critical Value</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.criticalValue.toFixed(4)}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">样本量1</Text>
+                <Text fontSize="sm" color="gray.500">Sample Size 1</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.n1}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">样本量2</Text>
+                <Text fontSize="sm" color="gray.500">Sample Size 2</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.n2}</Text>
               </CardBody>
             </Card>
             <Card>
               <CardBody>
-                <Text fontSize="sm" color="gray.500">计算方法</Text>
+                <Text fontSize="sm" color="gray.500">Calculation Method</Text>
                 <Text fontSize="2xl" fontWeight="bold">{result.method}</Text>
               </CardBody>
             </Card>
           </Grid>
 
           <Box p={4} borderWidth={1} borderRadius={4} bgColor="#f0f9ff" mb={4}>
-            <Text fontSize="lg" fontWeight="bold" mb={2}>置信区间解释</Text>
+            <Text fontSize="lg" fontWeight="bold" mb={2}>Confidence Interval Interpretation</Text>
             <Text>
-              我们有{Math.round(confidenceLevel * 100)}%的信心，认为两个总体均值之差（μ₁ - μ₂）落在区间
-              [{result.lower.toFixed(4)}, {result.upper.toFixed(4)}]内。
+              We are {Math.round(confidenceLevel * 100)}% confident that the difference between the two population means (μ₁ - μ₂) falls within the interval
+              [{result.lower.toFixed(4)}, {result.upper.toFixed(4)}].
               {result.lower <= 0 && result.upper >= 0 && (
                 <Text mt={2} color="orange.600">
-                  注意：由于置信区间包含0，在当前置信水平下，我们不能拒绝两个均值相等的假设。
+                  Note: Since the confidence interval includes 0, we cannot reject the hypothesis that the two means are equal at the current confidence level.
                 </Text>
               )}
               {result.lower > 0 && (
                 <Text mt={2} color="green.600">
-                  结论：数据集1的总体均值显著大于数据集2的总体均值。
+                  Conclusion: The population mean of Dataset 1 is significantly greater than that of Dataset 2.
                 </Text>
               )}
               {result.upper < 0 && (
                 <Text mt={2} color="green.600">
-                  结论：数据集1的总体均值显著小于数据集2的总体均值。
+                  Conclusion: The population mean of Dataset 1 is significantly less than that of Dataset 2.
                 </Text>
               )}
             </Text>
@@ -272,14 +272,14 @@ const TwoSampleCIComponent = () => {
       )}
 
       <Box p={4} borderWidth={1} borderRadius={4} bgColor="#f9fafb" mt={8}>
-        <Text fontSize="lg" fontWeight="bold" mb={2}>使用说明</Text>
-        <Text mb={2}>1. 输入两个数据集，支持多种格式（逗号、空格或换行分隔）</Text>
-        <Text mb={2}>2. 选择置信水平（90%、95%或99%）</Text>
-        <Text mb={2}>3. 选择合适的计算方法：</Text>
-        <Text ml={4} mb={1}>- 合并方差t检验：适用于方差相等的独立样本</Text>
-        <Text ml={4} mb={1}>- Welch t检验：适用于方差不等的独立样本</Text>
-        <Text ml={4} mb={1}>- 配对样本t检验：适用于相关的配对数据</Text>
-        <Text>4. 点击"计算置信区间"按钮查看结果</Text>
+        <Text fontSize="lg" fontWeight="bold" mb={2}>Instructions</Text>
+        <Text mb={2}>1. Enter two datasets, supporting multiple formats (comma, space, or line-separated)</Text>
+        <Text mb={2}>2. Select confidence level (90%, 95%, or 99%)</Text>
+        <Text mb={2}>3. Select appropriate calculation method:</Text>
+        <Text ml={4} mb={1}>- Pooled Variance t-test: Suitable for independent samples with equal variances</Text>
+        <Text ml={4} mb={1}>- Welch t-test: Suitable for independent samples with unequal variances</Text>
+        <Text ml={4} mb={1}>- Paired Samples t-test: Suitable for related paired data</Text>
+        <Text>4. Click the "Calculate Confidence Interval" button to view results</Text>
       </Box>
     </Box>
   );

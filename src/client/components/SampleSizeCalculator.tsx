@@ -26,68 +26,68 @@ interface SampleSizeCalculatorProps {
 }
 
 const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, basicStats }) => {
-  // 计算类型：均值或比例
+  // Calculation Type: Mean or Proportion
   const [calculationType, setCalculationType] = useState<'mean' | 'proportion'>('mean');
-  // 置信水平
+  // Confidence Level
   const [confidenceLevel, setConfidenceLevel] = useState<number>(0.95);
-  // 边际误差（置信区间的一半宽度）
+  // Margin of Error (half-width of confidence interval)
   const [marginOfError, setMarginOfError] = useState<string>('');
-  // 均值计算的参数
+  // Parameters for Mean Calculation
   const [meanParams, setMeanParams] = useState({
     populationStd: '',
     estimatedStd: '',
     useTDistribution: false
   });
-  // 比例计算的参数
+  // Parameters for Proportion Calculation
   const [proportionParams, setProportionParams] = useState({
     estimatedProportion: '',
     useConservativeEstimate: true
   });
-  // 计算结果
+  // Calculation Result
   const [result, setResult] = useState<number | null>(null);
-  // 错误信息
+  // Error Message
   const [error, setError] = useState<string | null>(null);
 
-  // 自动填充标准差（如果有数据集或基本统计量）
+  // Auto-populate standard deviation (if dataset or basic statistics are available)
   useEffect(() => {
-    // 优先使用传入的基本统计量
+    // Prefer using passed basic statistics
     if (basicStats && basicStats.std !== undefined) {
       setMeanParams(prev => ({ ...prev, estimatedStd: basicStats.std.toString() }));
     } 
-    // 否则使用数据集计算
+    // Otherwise calculate using dataset
     else if (dataset && dataset.length > 0) {
-      // 计算标准差的简单实现
+      // Simple implementation for calculating standard deviation
       const mean = dataset.reduce((sum, val) => sum + val, 0) / dataset.length;
       const std = Math.sqrt(dataset.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (dataset.length - 1));
       setMeanParams(prev => ({ ...prev, estimatedStd: std.toString() }));
     }
   }, [dataset, basicStats]);
 
-  // 处理计算
+  // Handle calculation
   const handleCalculate = () => {
     try {
       setError(null);
       setResult(null);
 
-      // 验证边际误差
+      // Validate margin of error
       const margin = parseFloat(marginOfError);
       if (isNaN(margin) || margin <= 0) {
-        throw new Error('请输入有效的边际误差（必须大于0）');
+        throw new Error('Please enter a valid margin of error (must be greater than 0)');
       }
 
       let sampleSize: number;
 
       if (calculationType === 'mean') {
-        // 均值样本量计算
+        // Mean sample size calculation
         const populationStd = meanParams.populationStd ? parseFloat(meanParams.populationStd) : undefined;
         const estimatedStd = meanParams.estimatedStd ? parseFloat(meanParams.estimatedStd) : undefined;
 
-        // 验证标准差
+        // Validate standard deviation
         if (populationStd !== undefined && (isNaN(populationStd) || populationStd <= 0)) {
-          throw new Error('总体标准差必须大于0');
+          throw new Error('Population standard deviation must be greater than 0');
         }
         if (estimatedStd !== undefined && (isNaN(estimatedStd) || estimatedStd <= 0)) {
-          throw new Error('估计的标准差必须大于0');
+          throw new Error('Estimated standard deviation must be greater than 0');
         }
 
         sampleSize = calculateSampleSizeForMean(confidenceLevel, margin, {
@@ -96,12 +96,12 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
           useTDistribution: meanParams.useTDistribution
         });
       } else {
-        // 比例样本量计算
+        // Proportion sample size calculation
         let estimatedProportion: number | undefined;
         if (!proportionParams.useConservativeEstimate) {
           estimatedProportion = parseFloat(proportionParams.estimatedProportion);
           if (isNaN(estimatedProportion) || estimatedProportion < 0 || estimatedProportion > 1) {
-            throw new Error('估计的比例必须在0到1之间');
+            throw new Error('Estimated proportion must be between 0 and 1');
           }
         }
 
@@ -113,11 +113,11 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
 
       setResult(sampleSize);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '计算过程中发生错误');
+      setError(err instanceof Error ? err.message : 'An error occurred during calculation');
     }
   };
 
-  // 重置表单
+  // Reset form
   const handleReset = () => {
     setMarginOfError('');
     setMeanParams({
@@ -137,19 +137,19 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
     <Card maxW="100%" margin="20px auto">
       <CardBody>
         <Text fontSize="2xl" fontWeight="bold" mb={4}>
-          样本量计算器
+          Sample Size Calculator
         </Text>
         
         <Text fontSize="sm" color="gray.600" mb={4}>
-          根据您指定的置信水平和边际误差，计算达到所需精度的最小样本量。
+          Calculate the minimum sample size needed to achieve your desired precision based on the specified confidence level and margin of error.
         </Text>
 
         <Divider my={2} />
 
-        {/* 计算类型选择 */}
+        {/* Calculation Type Selection */}
         <FormControl mb={3}>
           <FormLabel fontSize="lg" mb={2}>
-            计算类型
+            Calculation Type
           </FormLabel>
           <RadioGroup
             value={calculationType}
@@ -161,20 +161,20 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
           >
             <Box mr={4}>
               <Radio value="mean" />
-              <Text ml={2} display="inline">均值</Text>
+              <Text ml={2} display="inline">Mean</Text>
             </Box>
             <Box>
               <Radio value="proportion" />
-              <Text ml={2} display="inline">比例</Text>
+              <Text ml={2} display="inline">Proportion</Text>
             </Box>
           </RadioGroup>
         </FormControl>
 
         <Grid templateColumns={{ sm: '1fr 1fr' }} gap={4}>
-          {/* 置信水平 */}
+          {/* Confidence Level */}
           <GridItem>
             <FormControl>
-              <FormLabel>置信水平</FormLabel>
+              <FormLabel>Confidence Level</FormLabel>
               <Input
                 type="number"
                 value={confidenceLevel}
@@ -185,16 +185,16 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
                     setResult(null);
                   }
                 }}
-                placeholder="例如: 0.95"
+                placeholder="e.g., 0.95"
                 mb={2}
               />
             </FormControl>
           </GridItem>
 
-          {/* 边际误差 */}
+          {/* Margin of Error */}
           <GridItem>
             <FormControl>
-              <FormLabel>边际误差</FormLabel>
+              <FormLabel>Margin of Error</FormLabel>
               <Input
                 type="number"
                 value={marginOfError}
@@ -202,24 +202,24 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
                   setMarginOfError(e.target.value);
                   setResult(null);
                 }}
-                placeholder={calculationType === 'mean' ? "例如: 2.5" : "例如: 0.03"}
+                placeholder={calculationType === 'mean' ? "e.g., 2.5" : "e.g., 0.03"}
                 mb={2}
               />
             </FormControl>
           </GridItem>
         </Grid>
 
-        {/* 均值相关参数 */}
+        {/* Mean-related Parameters */}
         {calculationType === 'mean' && (
           <Box mt={2} mb={3}>
             <FormLabel fontSize="lg" mb={2}>
-              均值参数
-            </FormLabel>
+                Mean Parameters
+              </FormLabel>
             
             <Grid templateColumns={{ sm: '1fr 1fr' }} gap={4}>
               <GridItem>
                 <FormControl>
-                  <FormLabel>总体标准差（已知时）</FormLabel>
+                  <FormLabel>Population Standard Deviation (when known)</FormLabel>
                   <Input
                     type="number"
                     value={meanParams.populationStd}
@@ -234,7 +234,7 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
               
               <GridItem>
                 <FormControl>
-                  <FormLabel>估计的标准差（方差未知时）</FormLabel>
+                  <FormLabel>Estimated Standard Deviation (when variance unknown)</FormLabel>
                   <Input
                     type="number"
                     value={meanParams.estimatedStd}
@@ -244,7 +244,7 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
                     }}
                     mb={1}
                   />
-                  <FormHelperText>提示：当方差未知时，可通过预试验或历史数据估计标准差</FormHelperText>
+                  <FormHelperText>Tip: When variance is unknown, standard deviation can be estimated from pilot studies or historical data</FormHelperText>
                 </FormControl>
               </GridItem>
             </Grid>
@@ -259,29 +259,29 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
                 }}
               />
               <FormLabel htmlFor="use-t-distribution" mb={0} ml={2} display="inline">
-                使用t分布（小样本时更准确）
-              </FormLabel>
+                  Use t-distribution (more accurate for small samples)
+                </FormLabel>
             </Box>
             
             <Alert status="info" mt={2}>
-              <Text fontSize="sm">
-                当总体方差未知时，您必须提供估计的标准差。这可以通过以下方式获得：
-              </Text>
-              <ul style={{ marginTop: '5px', marginBottom: '5px', paddingLeft: '20px', fontSize: 'sm' }}>
-                <li>先前的研究或类似研究的结果</li>
-                <li>预试验数据</li>
-                <li>如果范围已知，标准差可粗略估计为范围的1/6</li>
-              </ul>
-            </Alert>
+                <Text fontSize="sm">
+                  When population variance is unknown, you must provide an estimated standard deviation. This can be obtained through:
+                </Text>
+                <ul style={{ marginTop: '5px', marginBottom: '5px', paddingLeft: '20px', fontSize: 'sm' }}>
+                  <li>Results from previous or similar studies</li>
+                  <li>Pilot study data</li>
+                  <li>If range is known, standard deviation can be roughly estimated as range/6</li>
+                </ul>
+              </Alert>
           </Box>
         )}
 
-        {/* 比例相关参数 */}
+        {/* Proportion-related Parameters */}
         {calculationType === 'proportion' && (
           <Box mt={2} mb={3}>
             <FormLabel fontSize="lg" mb={2}>
-              比例参数
-            </FormLabel>
+                Proportion Parameters
+              </FormLabel>
             
             <Box mb={2}>
               <Switch
@@ -293,13 +293,13 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
                 }}
               />
               <FormLabel htmlFor="use-conservative-estimate" mb={0} ml={2} display="inline">
-                使用保守估计（p=0.5，确保最大样本量）
-              </FormLabel>
+                  Use conservative estimate (p=0.5, ensures maximum sample size)
+                </FormLabel>
             </Box>
             
             {!proportionParams.useConservativeEstimate && (
               <FormControl>
-                <FormLabel>估计的比例</FormLabel>
+                <FormLabel>Estimated Proportion</FormLabel>
                 <Input
                   type="number"
                   value={proportionParams.estimatedProportion}
@@ -307,53 +307,53 @@ const SampleSizeCalculator: React.FC<SampleSizeCalculatorProps> = ({ dataset, ba
                     setProportionParams({ ...proportionParams, estimatedProportion: e.target.value });
                     setResult(null);
                   }}
-                  placeholder="例如: 0.65"
+                  placeholder="e.g., 0.65"
                   my={2}
                 />
               </FormControl>
             )}
             
             <Alert status="info" mt={2}>
-              <Text fontSize="sm">
-                保守估计使用p=0.5（此时方差最大），确保计算出的样本量足够大，无论实际比例如何。
-                如果您有先前的研究或理论基础来估计比例，可以取消勾选保守估计并输入您的估计值。
-              </Text>
-            </Alert>
+                <Text fontSize="sm">
+                  Conservative estimate uses p=0.5 (where variance is maximized), ensuring the calculated sample size is large enough regardless of the actual proportion.
+                  If you have previous research or theoretical basis to estimate the proportion, you can uncheck conservative estimate and enter your estimate.
+                </Text>
+              </Alert>
           </Box>
         )}
 
-        {/* 操作按钮 */}
+        {/* Action Buttons */}
         <Box mt={3} display="flex" gap={2}>
           <Button colorScheme="blue" onClick={handleCalculate}>
-            计算样本量
-          </Button>
-          <Button variant="outline" colorScheme="gray" onClick={handleReset}>
-            重置
-          </Button>
+                Calculate Sample Size
+              </Button>
+              <Button variant="outline" colorScheme="gray" onClick={handleReset}>
+                Reset
+              </Button>
         </Box>
 
-        {/* 错误信息 */}
+        {/* Error Message */}
         {error && (
           <Alert status="error" mt={3}>
             {error}
           </Alert>
         )}
 
-        {/* 计算结果 - 优化显示效果 */}
+        {/* Calculation Result - Optimized Display */}
         {result !== null && (
           <Card mt={4} bg="green.50" borderWidth={2} borderColor="green.300">
             <CardBody>
               <Text fontSize="lg" fontWeight="bold" mb={2} color="green.700">
-                计算结果 ✓
+                Calculation Result ✓
               </Text>
               <Text fontSize="1.5rem" fontWeight="bold" color="green.800" mb={3}>
-                所需最小样本量: {result}
+                Minimum Required Sample Size: {result}
               </Text>
               <Text fontSize="sm" color="gray.700" mt={1}>
-                置信水平: {(confidenceLevel * 100).toFixed(1)}%
+                Confidence Level: {(confidenceLevel * 100).toFixed(1)}%
               </Text>
               <Text fontSize="sm" color="gray.700">
-                边际误差: {marginOfError}
+                Margin of Error: {marginOfError}
               </Text>
             </CardBody>
           </Card>

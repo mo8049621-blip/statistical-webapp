@@ -3,17 +3,17 @@ import { Box, Text, Tabs, Tab, FormControl, FormLabel, Input, Select, Button, Ca
 import { calculateProportionConfidenceInterval, calculateTwoProportionConfidenceInterval } from '../utils/statistics';
 
 interface ProportionCIComponentProps {
-  // 可以根据需要添加props
+  // Props can be added as needed
 }
 
 const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
-  // 单比例参数
+  // One proportion parameters
   const [singleSuccessCount, setSingleSuccessCount] = useState<string>('185');
   const [singleSampleSize, setSingleSampleSize] = useState<string>('351');
   const [singleConfidenceLevel, setSingleConfidenceLevel] = useState<string>('0.95');
   const [singleMethod, setSingleMethod] = useState<'wald' | 'wilson'>('wald');
   
-  // 两比例参数
+  // Two proportion parameters
   const [successCount1, setSuccessCount1] = useState<string>('45');
   const [sampleSize1, setSampleSize1] = useState<string>('100');
   const [successCount2, setSuccessCount2] = useState<string>('30');
@@ -29,7 +29,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
   const [isSingleCalculated, setIsSingleCalculated] = useState(false);
   const [isTwoCalculated, setIsTwoCalculated] = useState(false);
   
-  // 设置示例数据
+  // Set Example Data
   const setExampleData = () => {
     setSuccessCount1('45');
     setSampleSize1('100');
@@ -42,11 +42,11 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
     setIsTwoCalculated(false);
   };
   
-  // 生成随机数据
+  // Generate Random Data
   const generateRandomData = () => {
-    const n1 = Math.floor(Math.random() * 50) + 50; // 50-100之间的样本大小
+    const n1 = Math.floor(Math.random() * 50) + 50; // Sample size between 50-100
     const n2 = Math.floor(Math.random() * 50) + 50;
-    const p1 = Math.random() * 0.8 + 0.1; // 0.1-0.9之间的概率
+    const p1 = Math.random() * 0.8 + 0.1; // Probability between 0.1-0.9
     const p2 = Math.random() * 0.8 + 0.1;
     
     const y1 = Math.floor(n1 * p1);
@@ -62,7 +62,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
   };
 
   const handleSingleProportionCalculate = () => {
-    // 重置状态
+    // Reset state
     setSingleError(null);
     setSingleResults(null);
     setIsSingleCalculated(true);
@@ -72,32 +72,32 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
       const n = parseInt(singleSampleSize, 10);
       const confidenceLevel = parseFloat(singleConfidenceLevel);
       
-      // 输入验证
+      // Input validation
       if (!singleSuccessCount || !singleSampleSize || !singleConfidenceLevel) {
-        throw new Error('请填写所有必填字段');
+        throw new Error('Please fill in all required fields');
       }
       
       if (isNaN(successCount) || isNaN(n) || isNaN(confidenceLevel)) {
-        throw new Error('请输入有效的数字');
+        throw new Error('Please enter valid numbers');
       }
       
       if (n <= 0) {
-        throw new Error('样本大小必须大于0');
+        throw new Error('Sample size must be greater than 0');
       }
       
       if (successCount < 0 || successCount > n) {
-        throw new Error('成功次数必须在0到样本大小之间');
+        throw new Error('Number of successes must be between 0 and sample size');
       }
       
       if (confidenceLevel <= 0 || confidenceLevel >= 1) {
-        throw new Error('置信水平必须在0到1之间');
+        throw new Error('Confidence level must be between 0 and 1');
       }
       
-      // 调用统计函数并获取结果
+      // Call statistical function and get results
       const results = calculateProportionConfidenceInterval(successCount, n, confidenceLevel, { method: singleMethod });
       
-      // 转换结果格式以匹配组件期望的属性名
-      // 计算标准误
+      // Convert result format to match component expected property names
+      // Calculate standard error
       const standardError = Math.sqrt((results.proportion * (1 - results.proportion)) / n);
       
       const formattedResults = {
@@ -116,7 +116,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
   };
 
   const handleTwoProportionCalculate = () => {
-    // 重置状态
+    // Reset state
     setTwoError('');
     setTwoResults(null);
     setIsTwoCalculated(true);
@@ -128,32 +128,32 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
       const n2 = parseInt(sampleSize2, 10);
       const confidenceLevel = parseFloat(twoConfidenceLevel);
       
-      // 输入验证
+      // Input validation
       if (!successCount1 || !sampleSize1 || !successCount2 || !sampleSize2 || !twoConfidenceLevel) {
-        throw new Error('请填写所有必填字段');
+        throw new Error('Please fill in all required fields');
       }
       
       if (isNaN(y1) || isNaN(n1) || isNaN(y2) || isNaN(n2) || isNaN(confidenceLevel)) {
-        throw new Error('请输入有效的数字');
+        throw new Error('Please enter valid numbers');
       }
       
       if (n1 <= 0 || n2 <= 0) {
-        throw new Error('样本大小必须大于0');
+        throw new Error('Sample size must be greater than 0');
       }
       
       if (y1 < 0 || y1 > n1 || y2 < 0 || y2 > n2) {
-        throw new Error('成功次数必须在0到对应样本大小之间');
+        throw new Error('Number of successes must be between 0 and corresponding sample size');
       }
       
       if (confidenceLevel <= 0 || confidenceLevel >= 1) {
-        throw new Error('置信水平必须在0到1之间');
+        throw new Error('Confidence level must be between 0 and 1');
       }
       
-      // 计算样本比例
+      // Calculate sample proportions
       const p1 = y1 / n1;
       const p2 = y2 / n2;
       
-      // 调用统计函数并获取结果，确保正确传递options对象
+      // Call statistical function and get results, ensure options object is correctly passed
       const results = calculateTwoProportionConfidenceInterval(
         y1, 
         n1, 
@@ -163,12 +163,12 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
         { method: twoMethod }
       );
       
-      // 确保结果存在
+      // Ensure results exist
       if (!results) {
-        throw new Error('计算结果为空');
+        throw new Error('Calculation result is empty');
       }
       
-      // 转换结果格式以匹配组件期望的属性名
+      // Convert result format to match component expected property names
       const formattedResults = {
         sampleProportion1: p1,
         sampleProportion2: p2,
@@ -176,13 +176,13 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
         lowerBound: results.lower !== undefined ? results.lower : null,
         upperBound: results.upper !== undefined ? results.upper : null,
         confidenceLevel: confidenceLevel,
-        // 直接使用results中的属性，无需重新计算
+        // Directly use properties from results without recalculation
         criticalValue: results.criticalValue || null,
         standardError: Math.sqrt((p1 * (1 - p1)) / n1 + (p2 * (1 - p2)) / n2),
         marginOfError: results.marginOfError || null
       };
       
-      // 确保设置结果
+      // Ensure results are set
       setTwoResults(formattedResults);
     } catch (error) {
       setTwoError((error as Error).message);
@@ -192,12 +192,12 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
 
   return (
     <Box p={6} bg="white" rounded="lg" shadow="md">
-      <Text fontSize="xl" fontWeight="bold" mb={6} textAlign="center">比例置信区间计算</Text>
+      <Text fontSize="xl" fontWeight="bold" mb={6} textAlign="center">Proportion Confidence Interval Calculation</Text>
       
       <Tabs index={activeTab === 'single' ? 0 : 1} onChange={(index) => setActiveTab(index === 0 ? 'single' : 'two')} mb={6}>
         <Box borderBottomWidth="1px" borderBottomColor="gray.200">
-          <Tab px={4} py={2}>单比例置信区间</Tab>
-          <Tab px={4} py={2}>两比例之差置信区间</Tab>
+          <Tab px={4} py={2}>Single Proportion CI</Tab>
+          <Tab px={4} py={2}>Two Proportion Difference CI</Tab>
         </Box>
       </Tabs>
 
@@ -205,7 +205,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
         <Box>
           <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6} mb={6}>
             <FormControl>
-              <FormLabel fontSize="sm">成功次数 (y)</FormLabel>
+              <FormLabel fontSize="sm">Success Count (y)</FormLabel>
               <Input
                 type="number"
                 value={singleSuccessCount}
@@ -214,7 +214,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontSize="sm">样本大小 (n)</FormLabel>
+              <FormLabel fontSize="sm">Sample Size (n)</FormLabel>
               <Input
                 type="number"
                 value={singleSampleSize}
@@ -223,7 +223,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel fontSize="sm">置信水平</FormLabel>
+              <FormLabel fontSize="sm">Confidence Level</FormLabel>
               <Select
                 value={singleConfidenceLevel}
                 onChange={(e) => setSingleConfidenceLevel(e.target.value)}
@@ -231,7 +231,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
                 <option value="0.90">90%</option>
                 <option value="0.95">95%</option>
                 <option value="0.99">99%</option>
-                <option value="">自定义</option>
+                <option value="">Custom</option>
               </Select>
               {singleConfidenceLevel && !['0.90', '0.95', '0.99'].includes(singleConfidenceLevel) && (
                 <Input
@@ -246,13 +246,13 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               )}
             </FormControl>
             <FormControl>
-              <FormLabel fontSize="sm">计算方法</FormLabel>
+              <FormLabel fontSize="sm">Calculation Method</FormLabel>
               <Select
                 value={singleMethod}
                 onChange={(e) => setSingleMethod(e.target.value as 'wald' | 'wilson')}
               >
-                <option value="wald">Wald区间</option>
-                <option value="wilson">Wilson得分区间</option>
+                <option value="wald">Wald Interval</option>
+                <option value="wilson">Wilson Score Interval</option>
               </Select>
             </FormControl>
           </Grid>
@@ -264,11 +264,11 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               size="lg"
               width="100%"
             >
-              计算单比例置信区间
+              Calculate Single Proportion CI
             </Button>
           </Box>
           
-          {/* 错误提示 */}
+          {/* Error message */}
           {singleError && (
             <Alert status="error" mt={4}>
               <AlertIcon />
@@ -276,43 +276,44 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
             </Alert>
           )}
           
-          {/* 提示信息 */}
+          {/* Prompt message */}
           {isSingleCalculated && !singleError && !singleResults && (
             <Alert status="warning" mt={4}>
               <AlertIcon />
-              <AlertDescription>无法计算结果，请检查输入值是否有效</AlertDescription>
+              <AlertDescription>Unable to calculate results, please check if input values are valid</AlertDescription>
             </Alert>
           )}
           
-          {/* 计算结果 */}
+          {/* Calculation results */}
           {singleResults && (
             <Card mt={6}>
               <CardBody>
-                <Text fontSize="lg" fontWeight="semibold" mb={4}>计算结果</Text>
+                <Text fontSize="lg" fontWeight="semibold" mb={4}>Calculation Results</Text>
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">样本比例 (̂p):</Text>
-                    <Text fontWeight="medium">{singleResults.sampleProportion ? singleResults.sampleProportion.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Sample Proportion (̂p):</Text>
+                    <Text fontWeight="medium">{singleResults.sampleProportion ? singleResults.sampleProportion.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">临界值 (z*):</Text>
-                    <Text fontWeight="medium">{singleResults.criticalValue ? singleResults.criticalValue.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Critical Value (z*):</Text>
+                    <Text fontWeight="medium">{singleResults.criticalValue ? singleResults.criticalValue.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">标准误:</Text>
-                    <Text fontWeight="medium">{singleResults.standardError ? singleResults.standardError.toFixed(6) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Standard Error:</Text>
+                    <Text fontWeight="medium">{singleResults.standardError ? singleResults.standardError.toFixed(6) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">边际误差:</Text>
-                    <Text fontWeight="medium">{singleResults.marginOfError ? singleResults.marginOfError.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Margin of Error:</Text>
+                    <Text fontWeight="medium">{singleResults.marginOfError ? singleResults.marginOfError.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                 </Grid>
                 <Box mt={4}>
-                  <Text fontSize="sm" color="gray.600">{singleResults.confidenceLevel ? singleResults.confidenceLevel * 100 : '--'}% 置信区间:</Text>
+                  <Text fontSize="sm" color="gray.600">{singleResults.confidenceLevel ? singleResults.confidenceLevel * 100 : '--'}% Confidence Interval:</Text>
                   <Text fontWeight="bold" fontSize="lg">
                     {singleResults.lowerBound !== undefined && singleResults.upperBound !== undefined 
                       ? `[${singleResults.lowerBound.toFixed(4)}, ${singleResults.upperBound.toFixed(4)}]` 
-                      : '无法计算'}
+                      : 'Cannot calculate'
+                    }
                   </Text>
                 </Box>
               </CardBody>
@@ -325,10 +326,10 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
         <Box>
           <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6} mb={6}>
             <Box>
-              <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>总体 1</Text>
+              <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>Population 1</Text>
               <Grid gap={4}>
                 <FormControl>
-                  <FormLabel fontSize="xs" color="gray.500">成功次数 (y₁)</FormLabel>
+                  <FormLabel fontSize="xs" color="gray.500">Success Count (y₁)</FormLabel>
                   <Input
                     type="number"
                     value={successCount1}
@@ -337,7 +338,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel fontSize="xs" color="gray.500">样本大小 (n₁)</FormLabel>
+                  <FormLabel fontSize="xs" color="gray.500">Sample Size (n₁)</FormLabel>
                   <Input
                     type="number"
                     value={sampleSize1}
@@ -348,10 +349,10 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               </Grid>
             </Box>
             <Box>
-              <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>总体 2</Text>
+              <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>Population 2</Text>
               <Grid gap={4}>
                 <FormControl>
-                  <FormLabel fontSize="xs" color="gray.500">成功次数 (y₂)</FormLabel>
+                  <FormLabel fontSize="xs" color="gray.500">Success Count (y₂)</FormLabel>
                   <Input
                     type="number"
                     value={successCount2}
@@ -360,7 +361,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel fontSize="xs" color="gray.500">样本大小 (n₂)</FormLabel>
+                  <FormLabel fontSize="xs" color="gray.500">Sample Size (n₂)</FormLabel>
                   <Input
                     type="number"
                     value={sampleSize2}
@@ -371,7 +372,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               </Grid>
             </Box>
             <FormControl>
-              <FormLabel fontSize="sm">置信水平</FormLabel>
+              <FormLabel fontSize="sm">Confidence Level</FormLabel>
               <Select
                 value={twoConfidenceLevel}
                 onChange={(e) => setTwoConfidenceLevel(e.target.value)}
@@ -379,7 +380,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
                 <option value="0.90">90%</option>
                 <option value="0.95">95%</option>
                 <option value="0.99">99%</option>
-                <option value="">自定义</option>
+                <option value="">Custom</option>
               </Select>
               {twoConfidenceLevel && !['0.90', '0.95', '0.99'].includes(twoConfidenceLevel) && (
                 <Input
@@ -394,13 +395,13 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               )}
             </FormControl>
             <FormControl>
-              <FormLabel fontSize="sm">计算方法</FormLabel>
+              <FormLabel fontSize="sm">Calculation Method</FormLabel>
               <Select
                 value={twoMethod}
                 onChange={(e) => setTwoMethod(e.target.value as 'wald' | 'continuity')}
               >
-                <option value="wald">Wald区间</option>
-                <option value="continuity">连续性修正</option>
+                <option value="wald">Wald Interval</option>
+                <option value="continuity">Continuity Correction</option>
               </Select>
             </FormControl>
           </Grid>
@@ -412,7 +413,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               size="lg"
               width="100%"
             >
-              示例数据
+              Example Data
             </Button>
             <Button
               onClick={generateRandomData}
@@ -420,7 +421,7 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               size="lg"
               width="100%"
             >
-              随机数据
+              Random Data
             </Button>
             <Button
               onClick={handleTwoProportionCalculate}
@@ -428,11 +429,11 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
               size="lg"
               width="100%"
             >
-              计算
+              Calculate
             </Button>
           </Grid>
           
-          {/* 错误提示 */}
+          {/* Error message */}
           {twoError && (
             <Alert status="error" mt={4}>
               <AlertIcon />
@@ -440,51 +441,52 @@ const ProportionCIComponent: React.FC<ProportionCIComponentProps> = () => {
             </Alert>
           )}
           
-          {/* 提示信息 */}
+          {/* Prompt message */}
           {isTwoCalculated && !twoError && !twoResults && (
             <Alert status="warning" mt={4}>
               <AlertIcon />
-              <AlertDescription>无法计算结果，请检查输入值是否有效</AlertDescription>
+              <AlertDescription>Unable to calculate results, please check if input values are valid</AlertDescription>
             </Alert>
           )}
           
-          {/* 计算结果 */}
+          {/* Calculation results */}
           {twoResults && (
             <Card mt={6}>
               <CardBody>
-                <Text fontSize="lg" fontWeight="semibold" mb={4}>计算结果</Text>
+                <Text fontSize="lg" fontWeight="semibold" mb={4}>Calculation Results</Text>
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">样本比例1 (̂p₁):</Text>
-                    <Text fontWeight="medium">{twoResults.sampleProportion1 ? twoResults.sampleProportion1.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Sample Proportion 1 (̂p₁):</Text>
+                    <Text fontWeight="medium">{twoResults.sampleProportion1 ? twoResults.sampleProportion1.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">样本比例2 (̂p₂):</Text>
-                    <Text fontWeight="medium">{twoResults.sampleProportion2 ? twoResults.sampleProportion2.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Sample Proportion 2 (̂p₂):</Text>
+                    <Text fontWeight="medium">{twoResults.sampleProportion2 ? twoResults.sampleProportion2.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">比例差 (̂p₁ - ̂p₂):</Text>
-                    <Text fontWeight="medium">{twoResults.proportionDifference ? twoResults.proportionDifference.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Proportion Difference (̂p₁ - ̂p₂):</Text>
+                    <Text fontWeight="medium">{twoResults.proportionDifference ? twoResults.proportionDifference.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">临界值 (z*):</Text>
-                    <Text fontWeight="medium">{twoResults.criticalValue ? twoResults.criticalValue.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Critical Value (z*):</Text>
+                    <Text fontWeight="medium">{twoResults.criticalValue ? twoResults.criticalValue.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">标准误:</Text>
-                    <Text fontWeight="medium">{twoResults.standardError ? twoResults.standardError.toFixed(6) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Standard Error:</Text>
+                    <Text fontWeight="medium">{twoResults.standardError ? twoResults.standardError.toFixed(6) : 'Cannot calculate'}</Text>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" color="gray.600">边际误差:</Text>
-                    <Text fontWeight="medium">{twoResults.marginOfError ? twoResults.marginOfError.toFixed(4) : '无法计算'}</Text>
+                    <Text fontSize="sm" color="gray.600">Margin of Error:</Text>
+                    <Text fontWeight="medium">{twoResults.marginOfError ? twoResults.marginOfError.toFixed(4) : 'Cannot calculate'}</Text>
                   </Box>
                 </Grid>
                 <Box mt={4}>
-                  <Text fontSize="sm" color="gray.600">{twoResults.confidenceLevel ? twoResults.confidenceLevel * 100 : '--'}% 置信区间:</Text>
+                  <Text fontSize="sm" color="gray.600">{twoResults.confidenceLevel ? twoResults.confidenceLevel * 100 : '--'}% Confidence Interval:</Text>
                   <Text fontWeight="bold" fontSize="lg">
                     {twoResults.lowerBound !== undefined && twoResults.upperBound !== undefined 
                       ? `[${twoResults.lowerBound.toFixed(4)}, ${twoResults.upperBound.toFixed(4)}]` 
-                      : '无法计算'}
+                      : 'Cannot calculate'
+                    }
                   </Text>
                 </Box>
               </CardBody>

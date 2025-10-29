@@ -11,8 +11,8 @@ interface ConfidenceIntervalsContainerProps {
   dataset?: number[];
   dataset2?: number[];
   pairedData?: {before: number[], after: number[]};
-  isGeneratedDataset?: boolean; // 新增标志，指示数据集是否为系统生成
-  distributionInfo?: { // 数据集分布信息
+  isGeneratedDataset?: boolean; // New flag indicating if the dataset is system-generated
+  distributionInfo?: { // Dataset distribution information
     type: string;
     name: string;
     parameters: Record<string, number>;
@@ -28,16 +28,16 @@ function ConfidenceIntervalsContainer({
   distributionInfo,
   basicStats
 }: ConfidenceIntervalsContainerProps) {
-  // 一级分类：均值之差 和 比例
-  const [primaryCategory, setPrimaryCategory] = useState('mean'); // 'mean' 或 'proportion'
+  // Primary category: mean difference and proportion
+  const [primaryCategory, setPrimaryCategory] = useState('mean'); // 'mean' or 'proportion'
   
-  // 二级分类：均值之差下的具体类型
+  // Secondary category: specific type under mean difference
   const [meanSubType, setMeanSubType] = useState('oneSample'); // 'oneSample', 'twoSample', 'paired'
   
-  // 二级分类：比例下的具体类型
+  // Secondary category: specific type under proportion
   const [proportionSubType, setProportionSubType] = useState('oneProportion'); // 'oneProportion', 'twoProportion'
 
-  // 根据当前选中的类型渲染对应的置信区间组件
+  // Render corresponding confidence interval component based on selected type
   const renderIntervalComponent = () => {
     if (primaryCategory === 'mean') {
       switch (meanSubType) {
@@ -70,10 +70,10 @@ function ConfidenceIntervalsContainer({
   return (
     <Box p={6} bg="white" rounded="lg" shadow="md">
       <Text fontSize="xl" fontWeight="bold" mb={6} textAlign="center">
-        置信区间分析
+        Confidence Interval Analysis
       </Text>
       
-      {/* 一级分类按钮 */}
+      {/* Primary category buttons */}
       <Stack direction="row" gap={4} mb={4} justifyContent="center">
         <Button
           variant={primaryCategory === 'mean' ? "solid" : "outline"}
@@ -81,7 +81,7 @@ function ConfidenceIntervalsContainer({
           size="lg"
           onClick={() => setPrimaryCategory('mean')}
         >
-          均值之差
+          Mean Difference
         </Button>
         <Button
           variant={primaryCategory === 'proportion' ? "solid" : "outline"}
@@ -89,13 +89,13 @@ function ConfidenceIntervalsContainer({
           size="lg"
           onClick={() => setPrimaryCategory('proportion')}
         >
-          比例
+          Proportion
         </Button>
       </Stack>
       
       <Divider mb={4} />
       
-      {/* 二级分类按钮 - 根据一级分类显示不同的选项 */}
+      {/* Secondary category buttons - show different options based on primary category */}
       {primaryCategory === 'mean' && (
         <Stack direction="row" gap={2} mb={6} flexWrap="wrap" justifyContent="center">
           <Button
@@ -103,21 +103,21 @@ function ConfidenceIntervalsContainer({
             colorScheme="green"
             onClick={() => setMeanSubType('oneSample')}
           >
-            单样本
+            One Sample Mean
           </Button>
           <Button
             variant={meanSubType === 'twoSample' ? "solid" : "outline"}
             colorScheme="green"
             onClick={() => setMeanSubType('twoSample')}
           >
-            两样本
+            Two Sample Mean Difference
           </Button>
           <Button
             variant={meanSubType === 'paired' ? "solid" : "outline"}
             colorScheme="green"
             onClick={() => setMeanSubType('paired')}
           >
-            配对样本
+            Paired Sample Mean Difference
           </Button>
         </Stack>
       )}
@@ -129,19 +129,19 @@ function ConfidenceIntervalsContainer({
             colorScheme="green"
             onClick={() => setProportionSubType('oneProportion')}
           >
-            单比例
+            One Proportion
           </Button>
           <Button
             variant={proportionSubType === 'twoProportion' ? "solid" : "outline"}
             colorScheme="green"
             onClick={() => setProportionSubType('twoProportion')}
           >
-            双比例之差
+            Two Proportion Difference
           </Button>
         </Stack>
       )}
       
-      {/* 渲染选中的置信区间组件 */}
+      {/* Render the selected confidence interval component */}
       <Box p={4}>
         {renderIntervalComponent()}
       </Box>
